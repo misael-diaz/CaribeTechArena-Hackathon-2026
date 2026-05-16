@@ -12,7 +12,7 @@ def twilio_webhook(request):
         from_number = request.POST.get('From', '').replace('whatsapp:', '')
         body = request.POST.get('Body', '').strip()
         
-        conv, created = Conversation.get_or_create(phone_e164=from_number)
+        conv, created = Conversation.objects.get_or_create(phone_e164=from_number)
         
         ai_service = AIService()
         reply_text = ai_service.get_response(body, parent_phone=from_number)
