@@ -15,9 +15,9 @@ def twilio_webhook(request):
         # Get or create conversation session
         conv, created = Conversation.objects.get_or_create(phone_e164=from_number)
         
-        # Use LangChain to get an AI response
+        # Use LangChain Agent to get a response with context
         ai_service = AIService()
-        reply_text = ai_service.get_response(body)
+        reply_text = ai_service.get_response(body, parent_phone=from_number)
         
         # Send reply via Twilio
         twilio_service = TwilioService()

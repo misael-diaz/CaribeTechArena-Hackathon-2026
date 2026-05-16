@@ -1,50 +1,75 @@
 import os
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+from langchain.agents import create_agent
+from langchain_deepseek import ChatDeepSeek
+from deepagents import create_deep_agent, SubAgent
+from .tools import get_children_info, get_last_transactions, get_recent_recharges
 
 class AIService:
     def __init__(self):
         self.api_key = os.getenv('PROVIDER_API_KEY')
-        self.base_url = os.getenv('PROVIDER_URL', 'https://api.openai.com/v1')
         
         if self.api_key:
-            # Flexible configuration using ChatOpenAI (compatible with DeepSeek and others)
-            self.llm = ChatOpenAI(
-                model="deepseek-chat", # Keeping the model name as it's likely what the provider needs
-                openai_api_key=self.api_key,
-                base_url=self.base_url,
+            # Use ChatDeepSeek as requested
+            self.llm = ChatDeepSeek(
+                model="deepseek-chat",
+                api_key=self.api_key,
                 temperature=0,
                 max_tokens=None,
                 timeout=60,
                 max_retries=0,
             )
+            
+            # Read the system prompt (full_prompt)
+            try:
+                prompt_path = os.path.join(os.path.dirname(__file__), 'system_prompt.md')
+                with open(prompt_path, 'r', encoding='utf-8') as f:
+                    self.full_prompt = f.read()
+            except Exception:
+                self.full_prompt = "You are a BioFood Assistant."
+
+            # Define tools
+            self.tools = [get_children_info, get_last_transactions, get_recent_recharges]
+            
+            # Create the agent using the requested pattern
+            self.agent = create_agent(
+                model=self.llm,
+                system_prompt=self.full_prompt,
+                tools=self.tools
+            )
         else:
             self.llm = None
+            self.agent = None
 
-    def get_response(self, user_input, conversation_history=None):
-        if not self.llm:
-            return "Lo siento, el proveedor de IA no está configurado. Por favor, revisa tu PROVIDER_API_KEY en el archivo .env."
+    def get_response(self, user_input, parent_phone=None):
+        if not self.agent:
+            return "Lo siento, el agente no está configurado."
 
-        # Read the system prompt from the external markdown file
-        try:
-            prompt_path = os.path.join(os.path.dirname(__file__), 'system_prompt.md')
-            with open(prompt_path, 'r', encoding='utf-8') as f:
-                system_prompt = f.read()
-        except Exception as e:
-            print(f"Error reading prompt file: {e}")
-            system_prompt = "Eres un asistente virtual de BioFood."
-
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", system_prompt),
-            ("user", "{input}")
-        ])
-
-        chain = prompt | self.llm | StrOutputParser()
+        # Add context to input
+        content = user_input
+        if parent_phone:
+            content = f"[PARENT_PHONE: {parent_phone}] {user_input}"
 
         try:
-            result = chain.invoke({"input": user_input})
-            return result
+            # Using the invoke pattern from the snippet
+            result = self.agent.invoke(
+                {
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": content,
+                        }
+                    ]
+                }
+            )
+            
+            # Handle the result (result is usually a dict or an object with content)
+            if isinstance(result, dict) and "output" in result:
+                return result["output"]
+            elif hasattr(result, 'content'):
+                return result.content
+            else:
+                return str(result)
+                
         except Exception as e:
-            print(f"Error in AI Service: {e}")
-            return "Lo siento, tuve un problema procesando tu solicitud."
+            print(f"Error in Agent: {e}")
+            return "Lo siento, no tengo información disponible en este momento."
