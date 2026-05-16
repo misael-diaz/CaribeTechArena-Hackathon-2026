@@ -59,7 +59,7 @@ def import_data():
 
         # 2. Process Recargas (305k rows)
         print("Processing ALL Recargas...")
-        pg_cur.execute("SELECT usuario_identificacion, nombre_estudiante, identificacion_padre, nombre_padre, colegio, fecha, valor FROM hackaton_recargas ORDER BY fecha DESC LIMIT 5000")
+        pg_cur.execute("SELECT usuario_identificacion, nombre_estudiante, identificacion_padre, nombre_padre, colegio, fecha, valor FROM hackaton_recargas WHERE colegio LIKE '%693%' ORDER BY fecha DESC LIMIT 5000")
         
         count = 0
         for row in pg_cur:
@@ -103,7 +103,7 @@ def import_data():
 
         # 3. Process ALL Ventas (4.2M rows)
         print("Processing ALL Ventas (4.2 million rows)... This will take a while.")
-        pg_cur.execute("SELECT usuario_identificacion, nombre_producto, fecha, cantidad, precio, nombre_estudiante, identificacion_padre, nombre_padre, colegio FROM hackaton_ventas ORDER BY fecha DESC LIMIT 5000")
+        pg_cur.execute("SELECT usuario_identificacion, nombre_producto, fecha, cantidad, precio, nombre_estudiante, identificacion_padre, nombre_padre, colegio FROM hackaton_ventas WHERE colegio LIKE '%%693' ORDER BY fecha DESC LIMIT 5000")
         
         count = 0
         transactions_to_create = []
