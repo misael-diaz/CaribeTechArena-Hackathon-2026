@@ -2,7 +2,7 @@ import os
 from langchain.agents import create_agent
 from langchain_deepseek import ChatDeepSeek
 from deepagents import create_deep_agent, SubAgent
-from .tools import get_children_info, get_last_transactions, get_recent_recharges
+
 
 class AIService:
     def __init__(self):
@@ -28,7 +28,9 @@ class AIService:
                 self.full_prompt = "You are a BioFood Assistant."
 
             # Define tools
-            self.tools = [get_children_info, get_last_transactions, get_recent_recharges]
+            from chat.skill.get_one_today_meals.tool import get_one_today_meals
+            from chat.skill.get_childs.tool import get_childs
+            self.tools = [get_one_today_meals, get_childs]
             
             # Create the agent using the requested pattern
             self.agent = create_agent(
@@ -63,8 +65,13 @@ class AIService:
             )
             
             # Handle the result (result is usually a dict or an object with content)
-            if isinstance(result, dict) and "output" in result:
-                return result["output"]
+            if isinstance(result, dict):
+                if "output" in result:
+                    return result["output"]
+                elif "messages" in result and len(result["messages"]) > 0:
+                    return result["messages"][-1].content
+                else:
+                    return str(result)
             elif hasattr(result, 'content'):
                 return result.content
             else:
