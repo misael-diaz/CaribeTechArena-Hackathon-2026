@@ -3,6 +3,10 @@ import django
 import psycopg2
 from decimal import Decimal
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
 
 # Setup Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Byte.settings')
@@ -35,11 +39,11 @@ def import_data():
     try:
         print("Connecting to external database...")
         pg_conn = psycopg2.connect(
-            host='3.208.123.187',
-            database='biofooddb',
-            user='hackathon_dev',
-            password='PasswordHackaton2026',
-            port='5432'
+            host=os.getenv('DB_HOST'),
+            database=os.getenv('DB_DATABASE'),
+            user=os.getenv('DB_USERNAME'),
+            password=os.getenv('DB_PASSWORD'),
+            port=os.getenv('DB_PORT', '5432')
         )
         # Use a server-side cursor to handle millions of rows
         pg_cur = pg_conn.cursor(name='huge_import_cursor')
