@@ -11,3 +11,6 @@ class Parent(models.Model):
 
     def __str__(self):
         return f"{self.name or self.phone_e164} ({self.students.count()} hijos)"
+
+    def get_students(self):
+        return Parent.objects.filter(phone_e164=self.phone_e164).values('students__name')

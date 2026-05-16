@@ -12,18 +12,14 @@ def twilio_webhook(request):
         from_number = request.POST.get('From', '').replace('whatsapp:', '')
         body = request.POST.get('Body', '').strip()
         
-        # Get or create conversation session
-        conv, created = Conversation.objects.get_or_create(phone_e164=from_number)
+        conv, created = Conversation.get_or_create(phone_e164=from_number)
         
-        # Use LangChain Agent to get a response with context
         ai_service = AIService()
         reply_text = ai_service.get_response(body, parent_phone=from_number)
         
-        # Send reply via Twilio
         twilio_service = TwilioService()
         twilio_service.send_message(from_number, reply_text)
         
-        # Update session data if needed
         session = conv.session_json or {}
         session['last_message'] = body
         conv.session_json = session
