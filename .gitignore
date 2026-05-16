@@ -7,7 +7,7 @@ media/
 staticfiles/
 
 # Env
-.env
+.env*
 venv/
 ENV/
 env/
