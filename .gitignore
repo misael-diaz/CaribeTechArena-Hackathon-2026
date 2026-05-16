@@ -23,7 +23,6 @@ Thumbs.db
 
 # Temporary scripts
 inspect_db.py
-import_all_data.py
 test_perms.py
 find_access.py
 database_structure.txt
