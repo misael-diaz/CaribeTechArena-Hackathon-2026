@@ -30,13 +30,34 @@ class AIService:
             # Define tools
             from chat.skill.get_one_today_meals.tool import get_one_today_meals
             from chat.skill.get_childs.tool import get_childs
-            self.tools = [get_one_today_meals, get_childs]
+            from chat.skill.get_student_balance.tool import get_student_balance
+            from chat.skill.get_student_allergens.tool import get_student_allergens
+            from chat.skill.get_recent_recharges.tool import get_recent_recharges
             
-            # Create the agent using the requested pattern
-            self.agent = create_agent(
+            self.tools = [
+                get_one_today_meals, 
+                get_childs, 
+                get_student_balance, 
+                get_student_allergens, 
+                get_recent_recharges
+            ]
+            
+            from deepagents.backends.filesystem import FilesystemBackend
+            from langgraph.checkpoint.memory import MemorySaver
+            
+            # Define root dir and backend for skills
+            root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            backend = FilesystemBackend(root_dir=root_dir)
+            checkpointer = MemorySaver()
+            
+            # Create the deep agent passing the skills folder
+            self.agent = create_deep_agent(
                 model=self.llm,
                 system_prompt=self.full_prompt,
-                tools=self.tools
+                tools=self.tools,
+                backend=backend,
+                checkpointer=checkpointer,
+                skills=["/chat/skill/"]
             )
         else:
             self.llm = None
@@ -61,7 +82,8 @@ class AIService:
                             "content": content,
                         }
                     ]
-                }
+                },
+                config={"configurable": {"thread_id": parent_phone or "default_thread"}}
             )
             
             # Handle the result (result is usually a dict or an object with content)
