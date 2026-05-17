@@ -78,22 +78,14 @@ class AllergenAlertService:
         timestamp = transaction.created_at.strftime('%d/%m/%Y %H:%M')
 
         message = (
-            f"ALERTA CRITICA BioFood - {parent_name}:
-"
-            f"Tu hijo/a {student.name} compró un producto con alérgenos registrados.
-\n"
-            f"Producto: {product.name}
-"
-            f"Alérgeno(s): {allergen_list}
-"
-            f"Hora: {timestamp}
-\n"
-            f"Acción recomendada:
-"
-            f"• Verifica inmediatamente el estado de tu hijo.
-"
-            f"• Responde 'ALTERNATIVAS' para ver opciones seguras.
-"
+            f"ALERTA CRITICA BioFood - {parent_name}:\n"
+            f"Tu hijo/a {student.name} compró un producto con alérgenos registrados.\n"
+            f"Producto: {product.name}\n"
+            f"Alérgeno(s): {allergen_list}\n"
+            f"Hora: {timestamp}\n"
+            f"Acción recomendada:\n"
+            f"• Verifica inmediatamente el estado de tu hijo.\n"
+            f"• Responde 'ALTERNATIVAS' para ver opciones seguras.\n"
             f"• Ingresa al portal: https://biofood.app/school/{student.school.id}/dashboard"
         )
 

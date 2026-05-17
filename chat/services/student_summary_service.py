@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.utils import timezone
 from student.models import StudentAllergen
 from product.models import ProductAllergen
+import logging
 
 from student.services import (
     get_student_by_parent_phone,
@@ -10,6 +11,9 @@ from student.services import (
     BalanceForecastService
 )
 from product.services import NutritionService
+
+
+logger = logging.getLogger(__name__)
 
 
 class StudentSummaryService:

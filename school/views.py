@@ -69,9 +69,10 @@ def school_dashboard(request):
     try:
         school_user = request.user.school_profile
         school = school_user.school
-    except SchoolUser.DoesNotExist:
-        # Si es superusuario, permitir acceso pero en modo admin
+    except User.school_profile.RelatedObjectDoesNotExist:
+        # Si el usuario no tiene SchoolUser vinculado
         if is_superuser:
+            # Superusuario puede acceder como admin
             school = School.objects.first()
             school_user = None  # Indica que es modo admin
         else:
