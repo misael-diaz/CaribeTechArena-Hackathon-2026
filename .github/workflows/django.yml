@@ -1,4 +1,4 @@
-name: Django CI
+name: Django CI/CD
 
 on:
   push:
@@ -7,20 +7,16 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [3.13]
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.13
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.13"
     
     - name: Install Dependencies
       run: |
@@ -44,3 +40,37 @@ jobs:
         SECRET_KEY: "ci-test-key-not-for-production"
         DEBUG: "True"
         ALLOWED_HOSTS: "*"
+
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy via SSH to Rackspace
+      uses: appleboy/ssh-action@v1.2.0
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.SSH_PORT || 22 }}
+        script: |
+          set -e
+          cd /home/ubuntu/hk/Byte
+
+          git pull origin main
+
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+          python manage.py migrate
+          python manage.py collectstatic --noinput
+
+          # Reiniciar gunicorn
+          # Opción 1: si usas systemd
+          # sudo systemctl restart gunicorn
+          # Opción 2: si usas supervisor
+          # sudo supervisorctl restart gunicorn
+          # Opción 3: si lo tienes corriendo manual
+          # pkill -f gunicorn || true
+          # nohup venv/bin/gunicorn Byte.wsgi:application --bind 0.0.0.0:8000 &
