@@ -27,7 +27,6 @@
             <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Tipo:</label>
             <select name="type" class="form-control" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
                 <option value="">Todos</option>
-                <option value="LOAN" {% if current_type == 'LOAN' %}selected{% endif %}>Préstamos</option>
                 <option value="STOCK" {% if current_type == 'STOCK' %}selected{% endif %}>Stock</option>
                 <option value="ALLERGEN" {% if current_type == 'ALLERGEN' %}selected{% endif %}>Alérgenos</option>
                 <option value="BALANCE" {% if current_type == 'BALANCE' %}selected{% endif %}>Saldo</option>
@@ -95,12 +94,6 @@
             </div>
             
             <div style="display: flex; gap: 0.5rem;">
-                {% if notification.action_url %}
-                <a href="{{ notification.action_url }}" class="btn btn-primary" style="font-size: 0.85rem;">
-                    Acción
-                </a>
-                {% endif %}
-                
                 {% if not notification.is_read %}
                 <a href="{% url 'school:notification_read' notification.id %}?next={{ request.path }}" 
                    class="btn btn-secondary" style="font-size: 0.85rem;">

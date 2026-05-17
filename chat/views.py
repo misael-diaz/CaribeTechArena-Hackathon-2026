@@ -5,6 +5,8 @@ from .twilio_service import TwilioService
 from .ai_service import AIService
 import json
 
+MAX_CHUNK = 10
+
 _ai_service = None
 
 def get_ai_service():
@@ -27,16 +29,27 @@ def twilio_webhook(request):
         from_number = request.POST.get('From', '').replace('whatsapp:', '')
         body = request.POST.get('Body', '').strip()
 
-        # Usar AI para responder
         conv, created = Conversation.objects.get_or_create(phone_e164=from_number)
-        ai_service = get_ai_service()
-        reply_text = ai_service.get_response(body, parent_phone=from_number)
+        session = conv.session_json or {}
+        history = session.get('history', [])
+
+        history.append({'role': 'user', 'content': body})
+        if len(history) > MAX_CHUNK:
+            history = history[-MAX_CHUNK:]
 
         twilio_service = get_twilio_service()
+        twilio_service.send_message(from_number, '✍️ Un momento, estoy consultando...')
+
+        ai_service = get_ai_service()
+        reply_text = ai_service.get_response(body, parent_phone=from_number, history=history)
+
         twilio_service.send_message(from_number, reply_text)
 
-        session = conv.session_json or {}
-        session['last_message'] = body
+        history.append({'role': 'assistant', 'content': reply_text})
+        if len(history) > MAX_CHUNK:
+            history = history[-MAX_CHUNK:]
+
+        session['history'] = history
         conv.session_json = session
         conv.save()
 

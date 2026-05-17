@@ -103,11 +103,13 @@ def import_data():
 
         # 3. Process ALL Ventas (4.2M rows)
         print("Processing ALL Ventas (4.2 million rows)... This will take a while.")
-        pg_cur.execute("SELECT usuario_identificacion, nombre_producto, fecha, cantidad, precio, nombre_estudiante, identificacion_padre, nombre_padre, colegio FROM hackaton_ventas WHERE colegio LIKE '%%693' ORDER BY fecha DESC LIMIT 5000")
+        pg_cur.close()
+        pg_cur2 = pg_conn.cursor()
+        pg_cur2.execute("SELECT usuario_identificacion, nombre_producto, fecha, cantidad, precio, nombre_estudiante, identificacion_padre, nombre_padre, colegio FROM hackaton_ventas WHERE colegio LIKE '%%693' ORDER BY fecha DESC LIMIT 5000")
         
         count = 0
         transactions_to_create = []
-        for row in pg_cur:
+        for row in pg_cur2:
             ext_id, prod_name, fecha_str, cant_str, precio_str, s_name, p_id, p_name, col_name = row
             ext_id = str(ext_id).strip()            # Ensure student exists
             if ext_id not in student_cache:

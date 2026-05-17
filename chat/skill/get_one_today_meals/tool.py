@@ -36,7 +36,51 @@ def get_one_today_meals(parent_phone: str, student_name: str) -> str:
         if not transactions:
             return f"{student_name} no ha registrado compras hoy."
 
-        meals = [f"{qty}x {name}" for qty, name in transactions]
-        return f"{student_name} comió hoy: {', '.join(meals)}."
+        meals = []
+        product_names = set()
+        for qty, name in transactions:
+            meals.append(f"{qty}x {name}")
+            product_names.add(name)
+
+        # Verificar alérgenos
+        try:
+            from product.models import ProductAllergen
+            from student.models import StudentAllergen
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT s.id FROM parent_parent p
+                    JOIN parent_parent_students pps ON p.id = pps.parent_id
+                    JOIN student_student s ON pps.student_id = s.id
+                    WHERE p.phone_e164 = %s AND UPPER(s.name) LIKE UPPER(%s)
+                    LIMIT 1
+                """, [parent_phone, f'%{student_name}%'])
+                row = cursor.fetchone()
+                student_id = row[0] if row else None
+
+            alerts = []
+            if student_id:
+                student_allergens = set(
+                    StudentAllergen.objects
+                    .filter(student_id=student_id)
+                    .values_list('allergen_name', flat=True)
+                )
+                for pname in product_names:
+                    product_allergens = set(
+                        ProductAllergen.objects
+                        .filter(product__name=pname)
+                        .values_list('allergen_name', flat=True)
+                    )
+                    if student_allergens & product_allergens:
+                        alerts.append(pname)
+                    elif pname.lower() in [a.lower() for a in student_allergens]:
+                        alerts.append(pname)
+
+            result = f"{student_name} comió hoy: {', '.join(meals)}."
+            if alerts:
+                result += f"\n\n⚠️ ALERTA: {student_name} consumió productos que coinciden con sus alérgenos registrados: {', '.join(alerts)}."
+        except Exception:
+            result = f"{student_name} comió hoy: {', '.join(meals)}."
+
+        return result
     except Exception as e:
         return f"Error al consultar transacciones: {str(e)}"

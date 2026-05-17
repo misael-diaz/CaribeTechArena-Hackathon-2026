@@ -34,6 +34,8 @@ class StockAlertService:
         if inventory.current_stock > inventory.minimum_stock:
             return alerts
 
+        self._create_portal_notification(inventory)
+
         admins = CafeteriaAdmin.objects.filter(school=inventory.school)
 
         if not admins:
@@ -46,6 +48,24 @@ class StockAlertService:
                 alerts.append(alert_data)
 
         return alerts
+
+    def _create_portal_notification(self, inventory: Inventory):
+        from school.models import Notification
+        priority = 'CRITICAL' if inventory.current_stock == 0 else 'HIGH'
+        Notification.objects.create(
+            school=inventory.school,
+            title=f'Stock {"CRITICO" if inventory.current_stock == 0 else "BAJO"}: {inventory.product.name}',
+            message=f'El producto {inventory.product.name} tiene {inventory.current_stock} unidades (minimo: {inventory.minimum_stock}).',
+            priority=priority,
+            type='STOCK',
+            action_url='/cafeteria/inventory/',
+            metadata={
+                'inventory_id': inventory.id,
+                'product_id': inventory.product.id,
+                'current_stock': inventory.current_stock,
+                'minimum_stock': inventory.minimum_stock
+            }
+        )
 
     def _send_alert(self, admin: CafeteriaAdmin, inventory: Inventory) -> Optional[dict]:
         """Envía alerta WhatsApp y crea notificación en portal."""
@@ -69,25 +89,6 @@ class StockAlertService:
             # Enviar WhatsApp
             twilio_service = TwilioServiceWrapper()
             message_sid = twilio_service.send_message(phone, message)
-
-            # CREAR NOTIFICACION EN EL PORTAL
-            from school.models import Notification
-            priority = 'CRITICAL' if current == 0 else 'HIGH'
-            
-            Notification.objects.create(
-                school=inventory.school,
-                title=f'Stock {"CRITICO" if current == 0 else "BAJO"}: {product_name}',
-                message=f'El producto {product_name} tiene {current} unidades (minimo: {minimum}).',
-                priority=priority,
-                type='STOCK',
-                action_url='/cafeteria/inventory/',
-                metadata={
-                    'inventory_id': inventory.id,
-                    'product_id': inventory.product.id,
-                    'current_stock': current,
-                    'minimum_stock': minimum
-                }
-            )
 
             if message_sid:
                 alert_data = {

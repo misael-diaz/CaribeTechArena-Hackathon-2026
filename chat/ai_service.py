@@ -42,6 +42,10 @@ class AIService:
             from chat.skill.suggest_healthy_alternatives.tool import suggest_healthy_alternatives
             from chat.skill.get_student_summary.tool import get_student_summary, get_multi_student_summary
             from chat.skill.get_daily_nutrition_summary.tool import get_daily_nutrition_summary
+            from chat.skill.buy_product.tool import buy_product
+            from chat.skill.get_available_products.tool import get_available_products
+            from chat.skill.get_transaction_history.tool import get_transaction_history
+            from chat.skill.get_school_info.tool import get_school_info
 
             self.tools = [
                 get_one_today_meals,
@@ -56,7 +60,11 @@ class AIService:
                 suggest_healthy_alternatives,
                 get_student_summary,
                 get_multi_student_summary,
-                get_daily_nutrition_summary
+                get_daily_nutrition_summary,
+                buy_product,
+                get_available_products,
+                get_transaction_history,
+                get_school_info,
             ]
             
             from deepagents.backends.filesystem import FilesystemBackend
@@ -80,7 +88,7 @@ class AIService:
             self.llm = None
             self.agent = None
 
-    def get_response(self, user_input, parent_phone=None):
+    def get_response(self, user_input, parent_phone=None, history=None):
         if not self.agent:
             return "Lo siento, el agente no está configurado."
 
@@ -92,10 +100,21 @@ class AIService:
                         "Por favor, comunícate con la administración de la escuela para registrar "
                         "tu número en la plataforma y acceder a los servicios.")
 
-        # Add context to input
+        # Build context from recent history
+        context_parts = []
+        if history:
+            for msg in history:
+                role = "Usuario" if msg['role'] == 'user' else "Asistente"
+                context_parts.append(f"{role}: {msg['content']}")
+            context_str = "\n".join(context_parts)
+        else:
+            context_str = ""
+
         content = user_input
         if parent_phone:
             content = f"[PARENT_PHONE: {parent_phone}] {user_input}"
+        if context_str:
+            content = f"[CONTEXTO RECIENTE]\n{context_str}\n\n[MENSAJE ACTUAL]\n{content}"
 
         try:
             # Using the invoke pattern from the snippet

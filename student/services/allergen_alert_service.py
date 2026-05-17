@@ -39,10 +39,11 @@ class AllergenAlertService:
             .values_list('allergen_name', flat=True)
         )
 
-        if not product_allergens:
-            return alerts
-
         matching_allergens = student_allergens & product_allergens
+
+        # También verificar si el nombre del producto coincide con algún alérgeno del estudiante
+        if product.name.lower() in [a.lower() for a in student_allergens]:
+            matching_allergens.add(product.name)
 
         if not matching_allergens:
             return alerts
@@ -86,7 +87,7 @@ class AllergenAlertService:
             f"Acción recomendada:\n"
             f"• Verifica inmediatamente el estado de tu hijo.\n"
             f"• Responde 'ALTERNATIVAS' para ver opciones seguras.\n"
-            f"• Ingresa al portal: https://biofood.app/school/{student.school.id}/dashboard"
+            f"• Si tienes dudas, escribe aquí mismo o contacta a la administración del colegio."
         )
 
         try:

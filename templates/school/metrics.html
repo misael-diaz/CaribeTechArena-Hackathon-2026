@@ -38,6 +38,44 @@
                 </div>
             </div>
 
+            <div class="mb-3">
+                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#resumenCollapse" aria-expanded="false" aria-controls="resumenCollapse">
+                    📊 Resumen por endpoint
+                </button>
+            </div>
+            <div class="collapse" id="resumenCollapse">
+                <div class="table-responsive mb-4">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Req</th>
+                                <th>Promedio (ms)</th>
+                                <th>Promedio (s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in summary %}
+                            <tr>
+                                <td>{{ s.endpoint }}</td>
+                                <td>{{ s.total_req }}</td>
+                                <td>{{ s.avg_ms|floatformat:0 }}</td>
+                                <td>{{ s.avg_ms|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-secondary">
+                            <tr>
+                                <td><strong>Global</strong></td>
+                                <td>{{ total_count }}</td>
+                                <td><strong>{{ overall_avg|floatformat:0 }}</strong></td>
+                                <td><strong>{{ overall_avg|floatformat:2 }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
             <h4 class="mb-3">Detalles recientes</h4>
             <div class="table-responsive">
                 <table class="table table-striped">

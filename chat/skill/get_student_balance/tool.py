@@ -9,7 +9,7 @@ def get_student_balance(parent_phone: str, student_name: str) -> str:
     try:
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT s.name, printf('%.2f', s.balance) as balance
+                SELECT s.name, s.balance
                 FROM parent_parent p
                 JOIN parent_parent_students pps ON p.id = pps.parent_id
                 JOIN student_student s ON pps.student_id = s.id
@@ -22,6 +22,6 @@ def get_student_balance(parent_phone: str, student_name: str) -> str:
             return f"No se encontró un estudiante llamado {student_name} vinculado a este número."
 
         name, balance = row
-        return f"El saldo actual de {name} es de ${balance}."
+        return f"El saldo actual de {name} es de ${float(balance):.2f}."
     except Exception as e:
         return f"Error al consultar el saldo: {str(e)}"

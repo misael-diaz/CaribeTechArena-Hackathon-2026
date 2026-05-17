@@ -202,12 +202,12 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'✓ Transacción: {t_data["student"].name} → {t_data["product"].name}'))
 
         # --- 7. Crear recargas ---
-        Recarga.objects.get_or_create(
-            student=students[0],
-            valor=10000,
-            fecha=start_of_today + timedelta(hours=9),
-            defaults={'description': 'Recarga inicial'}
-        )
+        if not Recarga.objects.filter(student=students[0], fecha=start_of_today + timedelta(hours=9)).exists():
+            Recarga.objects.create(
+                student=students[0],
+                valor=10000,
+                fecha=start_of_today + timedelta(hours=9),
+            )
         self.stdout.write(self.style.SUCCESS('✓ Recarga inicial creada'))
 
         # --- 8. Crear notificaciones de ejemplo ---

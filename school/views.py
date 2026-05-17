@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.db import transaction as db_transaction
 from django.db.models import Count, DecimalField, ExpressionWrapper, F, Sum
@@ -87,19 +89,14 @@ def school_dashboard(request):
         ).select_related('school', 'user')[:10]
 
         notification_stats = {
-            'loans': 0,
             'stock': Notification.objects.filter(type='STOCK', is_read=False).count(),
             'allergen': Notification.objects.filter(type='ALLERGEN', is_read=False).count(),
             'total': Notification.objects.filter(is_read=False).count(),
         }
 
-        # Admin ve todos los prestamos → [ELIMINADO: sistema de préstamos retirado]
-        recent_loans = []
-
         stats = {
             'total_students': Student.objects.count(),
             'unread_notifications': notification_stats['total'],
-            'pending_loans': 0,
         }
         transactions = Transaction.objects.all()
     else:
@@ -110,19 +107,14 @@ def school_dashboard(request):
         ).select_related('user')[:10]
 
         notification_stats = {
-            'loans': 0,
             'stock': Notification.objects.filter(school=school, type='STOCK', is_read=False).count(),
             'allergen': Notification.objects.filter(school=school, type='ALLERGEN', is_read=False).count(),
             'total': Notification.objects.filter(school=school, is_read=False).count(),
         }
 
-        # Usuario normal ve todos los prestamos → [ELIMINADO: sistema de préstamos retirado]
-        recent_loans = []
-
         stats = {
             'total_students': Student.objects.filter(school=school).count(),
             'unread_notifications': notification_stats['total'],
-            'pending_loans': 0,
         }
         transactions = Transaction.objects.filter(student__school=school)
 
@@ -157,8 +149,43 @@ def school_dashboard(request):
         pie_stops.append(f"{category['color']} {cursor:.1f}% {next_cursor:.1f}%")
         cursor = next_cursor
 
+    from django.db.models.functions import TruncMonth
+
+    top_category = category_sales[0]['name'] if category_sales else 'Sin datos'
+    sales_transactions = transactions.count()
+
+    monthly_rows = (
+        transactions.annotate(month=TruncMonth('created_at'))
+        .values('month')
+        .annotate(total=Sum(sale_amount))
+        .order_by('month')
+    )
+    max_month = max((r['total'] or 0) for r in monthly_rows) if monthly_rows else 1
+    month_names = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+    monthly_sales = []
+    for r in monthly_rows:
+        if r['month']:
+            m = r['month'].month - 1
+            label = month_names[m]
+            val = float(r['total'] or 0)
+            monthly_sales.append({
+                'name': label,
+                'total': val,
+                'height': round(val / float(max_month) * 100, 1) if max_month else 0,
+            })
+
+    current_year = timezone.now().year
+
+    stats['total_sales'] = total_sales
+    stats['sales_transactions'] = sales_transactions
+    stats['top_category'] = top_category
+
+    dashboard_scope = school.name if school else 'Todos los colegios'
+
     context = {
         'school': school,
+        'school_user': school_user,
+        'dashboard_scope': dashboard_scope,
         'is_superuser': is_superuser,
         'unread_notifications': unread_notifications,
         'notification_stats': notification_stats,
@@ -166,16 +193,32 @@ def school_dashboard(request):
         'recent_sales': transactions.order_by('-created_at')[:8],
         'total_sales': total_sales,
         'category_sales': category_sales,
-        'pie_stops': pie_stops,
-        'recent_loans': recent_loans,
+        'pie_gradient': ', '.join(pie_stops),
+        'monthly_sales': monthly_sales,
+        'current_year': current_year,
     }
     return render(request, 'school/dashboard.html', context)
 
 
 @login_required
 def create_sale(request):
+    is_superuser = request.user.is_superuser
+    try:
+        user_school = request.user.school_profile.school
+    except (AttributeError, User.school_profile.RelatedObjectDoesNotExist):
+        user_school = None
+
+    selected_school_id = request.GET.get('school') or request.POST.get('school')
+    if selected_school_id:
+        try:
+            selected_school = School.objects.get(id=selected_school_id)
+        except (School.DoesNotExist, ValueError):
+            selected_school = user_school or School.objects.first() if is_superuser else None
+    else:
+        selected_school = user_school or (School.objects.first() if is_superuser else None)
+
     if request.method == 'POST':
-        form = SaleForm(request.POST, is_superuser=request.user.is_superuser)
+        form = SaleForm(request.POST, selected_school=selected_school, is_superuser=is_superuser)
         if form.is_valid():
             try:
                 with db_transaction.atomic():
@@ -184,11 +227,9 @@ def create_sale(request):
                     quantity = form.cleaned_data['quantity']
                     total = form.cleaned_data['total']
 
-                    # Actualizar stock
                     inventory.current_stock -= quantity
                     inventory.save()
 
-                    # Crear transaccion
                     transaction = Transaction.objects.create(
                         student=student,
                         product=inventory.product,
@@ -197,7 +238,6 @@ def create_sale(request):
                         created_at=timezone.now(),
                     )
 
-                    # Actualizar saldo del estudiante
                     student.balance -= total
                     student.save()
 
@@ -206,10 +246,17 @@ def create_sale(request):
             except Exception as e:
                 messages.error(request, f'Error al procesar la venta: {e}')
     else:
-        form = SaleForm(is_superuser=request.user.is_superuser)
+        form = SaleForm(selected_school=selected_school, is_superuser=is_superuser)
+
+    has_inventory = Inventory.objects.filter(
+        school=selected_school, current_stock__gt=0
+    ).exists() if selected_school else False
 
     context = {
         'form': form,
+        'is_superuser': is_superuser,
+        'selected_school': selected_school,
+        'has_inventory': has_inventory,
         'recent_sales': Transaction.objects.order_by('-created_at')[:8],
     }
     return render(request, 'school/create_sale.html', context)
@@ -217,31 +264,83 @@ def create_sale(request):
 
 @login_required
 def notifications_list(request):
-    school_user = request.user.school_profile
-    school = school_user.school
+    try:
+        school_user = request.user.school_profile
+        school = school_user.school
+    except ObjectDoesNotExist:
+        if request.user.is_superuser:
+            school = None
+        else:
+            messages.error(request, 'Acceso denegado.')
+            return redirect('school:dashboard')
 
-    notifications = Notification.objects.filter(
-        school=school
-    ).select_related('user').order_by('-created_at')
+    notifications = Notification.objects.all()
+    if school:
+        notifications = notifications.filter(school=school)
 
-    # Marcar como leidas
-    Notification.objects.filter(
-        school=school,
-        is_read=False
-    ).update(is_read=True, read_at=timezone.now())
+    current_type = request.GET.get('type', '')
+    if current_type:
+        notifications = notifications.filter(type=current_type)
+
+    show_read = request.GET.get('show_read') == 'true'
+    if not show_read:
+        notifications = notifications.filter(is_read=False)
+
+    page = int(request.GET.get('page', 1))
+    page_size = 20
+    total = notifications.count()
+    has_next = (page * page_size) < total
+    next_page = page + 1
+
+    notifications = notifications.select_related('user').order_by('-created_at')
+    start = (page - 1) * page_size
+    notifications = notifications[start:start + page_size]
+
+    if school:
+        Notification.objects.filter(
+            school=school,
+            is_read=False
+        ).exclude(
+            id__in=[n.id for n in notifications if not n.is_read]
+        ).update(is_read=True, read_at=timezone.now())
 
     context = {
         'notifications': notifications,
         'school': school,
+        'current_type': current_type,
+        'show_read': show_read,
+        'has_next': has_next,
+        'next_page': next_page,
     }
     return render(request, 'school/notifications.html', context)
+
+
+@login_required
+def notifications_read_all(request):
+    try:
+        school_user = request.user.school_profile
+        school = school_user.school
+    except (AttributeError, User.school_profile.RelatedObjectDoesNotExist):
+        if request.user.is_superuser:
+            school = None
+        else:
+            messages.error(request, 'Acceso denegado.')
+            return redirect('school:dashboard')
+
+    qs = Notification.objects.filter(is_read=False)
+    if school:
+        qs = qs.filter(school=school)
+    qs.update(is_read=True, read_at=timezone.now())
+
+    messages.success(request, 'Todas las notificaciones han sido marcadas como leídas.')
+    return redirect('school:notifications')
 
 
 @login_required
 def mark_notification_as_read(request, notification_id):
     notification = get_object_or_404(Notification, id=notification_id)
     notification.mark_as_read()
-    return redirect('school:notifications_list')
+    return redirect('school:notifications')
 
 
 @login_required
@@ -282,17 +381,23 @@ def dashboard_chart_data(request):
 
 
 from django.http import JsonResponse
+from product.models import Product
 
 
 @login_required
 def dashboard_chart_data(request):
-    # Datos para gráfico de ventas por categoría
-    school_user = request.user.school_profile
-    school = school_user.school
+    try:
+        school_user = request.user.school_profile
+        school = school_user.school
+    except (AttributeError, ObjectDoesNotExist):
+        if request.user.is_superuser:
+            school = None
+        else:
+            return JsonResponse({'error': 'Acceso denegado'}, status=403)
 
-    transactions = Transaction.objects.filter(
-        student__school=school
-    )
+    transactions = Transaction.objects.all()
+    if school:
+        transactions = transactions.filter(student__school=school)
 
     sale_amount = ExpressionWrapper(
         F('price') * F('quantity'),
@@ -337,9 +442,69 @@ def metrics_list(request):
     # Obtener métricas recientes
     metrics = EndpointMetric.objects.all().order_by('-created_at')[:100]
 
+    from django.db.models import Avg
+
+    summary = (
+        EndpointMetric.objects.values('endpoint')
+        .annotate(
+            avg_ms=Avg('response_time_ms'),
+            total_req=Count('id')
+        )
+        .order_by('-avg_ms')
+    )
+
     context = {
         'metrics': metrics,
+        'summary': summary,
         'total_count': EndpointMetric.objects.count(),
         'last_24h': EndpointMetric.objects.filter(created_at__gte=timezone.now() - timezone.timedelta(hours=24)).count(),
+        'overall_avg': EndpointMetric.objects.aggregate(Avg('response_time_ms'))['response_time_ms__avg'],
     }
     return render(request, 'school/metrics.html', context)
+
+
+@login_required
+def kiosko_view(request):
+    try:
+        school_user = request.user.school_profile
+        school = school_user.school
+    except (AttributeError, User.school_profile.RelatedObjectDoesNotExist):
+        if request.user.is_superuser:
+            school = None
+        else:
+            messages.error(request, 'Tu usuario no esta asociado a ningun colegio.')
+            return redirect('school:logout')
+
+    if school:
+        inventory = Inventory.objects.filter(
+            school=school, current_stock__gt=0
+        ).select_related('product').order_by('product__category', 'product__name')
+        low_stock = Inventory.objects.filter(
+            school=school, current_stock__gt=0, current_stock__lte=F('minimum_stock')
+        ).select_related('product')
+    elif request.user.is_superuser:
+        inventory = Inventory.objects.filter(
+            current_stock__gt=0
+        ).select_related('product', 'school').order_by('school__name', 'product__category', 'product__name')
+        low_stock = Inventory.objects.filter(
+            current_stock__gt=0, current_stock__lte=F('minimum_stock')
+        ).select_related('product', 'school')
+    else:
+        inventory = []
+        low_stock = []
+
+    categories = {}
+    for inv in inventory:
+        cat = inv.product.category
+        if cat not in categories:
+            categories[cat] = []
+        categories[cat].append(inv)
+
+    context = {
+        'categories': categories,
+        'school': school,
+        'low_stock': low_stock,
+        'total_products': inventory.count(),
+        'low_stock_count': low_stock.count(),
+    }
+    return render(request, 'school/kiosko.html', context)

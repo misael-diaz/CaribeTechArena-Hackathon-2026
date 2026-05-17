@@ -340,16 +340,18 @@
                         {% if user.is_superuser or perms.school.can_manage_inventory %}
                         <a href="{% url 'school:create_sale' %}">Registrar venta</a>
                         {% endif %}
+                        <a href="{% url 'school:kiosko' %}">Kiosko</a>
                         <a href="{% url 'school:notifications' %}">
                             Notificaciones
                             {% if user.school_profile %}
-                                {% if user.school_profile.school.notifications.filter.is_read.count %}
-                                <span class="notification-badge">{{ user.school_profile.school.notifications.filter.is_read.count }}</span>
-                                {% endif %}
+                                <span class="notification-badge">{{ user.school_profile.school.notifications.all.count }}</span>
                             {% elif user.is_superuser %}
                                 <span class="notification-badge">ADMIN</span>
                             {% endif %}
                         </a>
+                        {% if user.is_superuser or perms.school.can_view_dashboard %}
+                        <a href="{% url 'school:metrics' %}">📊 Métricas</a>
+                        {% endif %}
                         {% if user.is_superuser %}
                         <a href="/admin/">Admin Django</a>
                         {% endif %}
