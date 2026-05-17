@@ -1,0 +1,166 @@
+{% extends 'school/base.html' %}
+{% block title %}Kiosko - BioFood{% endblock %}
+{% block content %}
+<style>
+    .kiosko-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    .kiosko-title {
+        font-size: 1.9rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: #0f172a;
+    }
+    .kiosko-subtitle {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-top: 0.35rem;
+    }
+    .kiosko-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.25rem;
+    }
+    .product-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        transition: all 0.2s;
+    }
+    .product-card:hover {
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+        transform: translateY(-2px);
+    }
+    .product-name {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+    }
+    .product-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .product-price {
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: #10b981;
+    }
+    .stock-badge {
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    .stock-ok {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    .stock-low {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    .category-section {
+        margin-bottom: 2rem;
+    }
+    .category-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #10b981;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .category-count {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #64748b;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #94a3b8;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+    .low-stock-bar {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.5rem;
+        color: #991b1b;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .school-name {
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="kiosko-header">
+    <div>
+        <h1 class="kiosko-title">Kiosko</h1>
+        <p class="kiosko-subtitle">
+            {% if school %}
+                {{ school.name }} · {{ total_products }} productos disponibles
+            {% else %}
+                Todos los colegios · {{ total_products }} productos disponibles
+            {% endif %}
+        </p>
+    </div>
+    {% if low_stock_count > 0 %}
+    <span class="stock-badge stock-low">{{ low_stock_count }} con stock bajo</span>
+    {% endif %}
+</div>
+
+{% if low_stock %}
+    <div class="low-stock-bar">
+        ⚠️ Productos con stock bajo:
+        {% for inv in low_stock %}
+            {{ inv.product.name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if not categories %}
+    <div class="empty-state">
+        No hay productos disponibles en el kiosko.
+    </div>
+{% endif %}
+
+{% for cat, items in categories.items %}
+<div class="category-section">
+    <div class="category-title">
+        {{ cat }} <span class="category-count">({{ items|length }})</span>
+    </div>
+    <div class="kiosko-grid">
+        {% for inv in items %}
+        <div class="product-card">
+            <div class="product-name">{{ inv.product.name }}</div>
+            <div class="product-meta">
+                <span class="product-price">${{ inv.product.price|floatformat:2 }}</span>
+                <span class="stock-badge {% if inv.current_stock <= inv.minimum_stock %}stock-low{% else %}stock-ok{% endif %}">
+                    {{ inv.current_stock }} {% if inv.current_stock == 1 %}unidad{% else %}uds{% endif %}
+                </span>
+            </div>
+            {% if not school %}
+            <div class="school-name">{{ inv.school.name }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

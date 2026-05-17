@@ -1,0 +1,385 @@
+{% extends 'school/base.html' %}
+
+{% block title %}Dashboard - BioFood{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-hero {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .dashboard-title {
+        color: #0f172a;
+        font-size: 1.9rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.35rem;
+    }
+
+    .dashboard-subtitle {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .scope-pill {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+        border-radius: 999px;
+        padding: 0.55rem 0.9rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .analytics-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+        padding: 1.35rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .analytics-card-header {
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 1.2rem;
+    }
+
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .kpi-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+        padding: 1.35rem;
+        min-height: 138px;
+    }
+
+    .kpi-label {
+        color: #94a3b8;
+        font-size: 0.88rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .kpi-number {
+        color: #020617;
+        font-size: 1.65rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.8rem;
+    }
+
+    .kpi-footnote {
+        color: #64748b;
+        font-size: 0.86rem;
+        line-height: 1.45;
+    }
+
+    .bar-chart {
+        height: 300px;
+        display: grid;
+        grid-template-columns: 42px 1fr;
+        gap: 1rem;
+    }
+
+    .chart-axis {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        color: #94a3b8;
+        font-size: 0.8rem;
+        padding-bottom: 2rem;
+    }
+
+    .chart-bars {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(28px, 1fr));
+        gap: 1rem;
+        align-items: end;
+        border-bottom: 1px solid #e2e8f0;
+        background: repeating-linear-gradient(to top, #ffffff 0, #ffffff 58px, #e2e8f0 59px, #ffffff 60px);
+        padding: 0 0 2rem;
+    }
+
+    .bar-item {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 0.65rem;
+        min-width: 0;
+    }
+
+    .bar-fill {
+        width: min(36px, 70%);
+        min-height: 4px;
+        border-radius: 7px 7px 0 0;
+        background: #10b981;
+        box-shadow: inset 0 -8px 0 rgba(15, 23, 42, 0.08);
+    }
+
+    .bar-label {
+        color: #94a3b8;
+        font-size: 0.78rem;
+    }
+
+    .pie-wrap {
+        display: grid;
+        place-items: center;
+        margin: 1rem 0 1.4rem;
+    }
+
+    .pie-chart {
+        width: 154px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: conic-gradient({{ pie_gradient }});
+        box-shadow: inset 0 0 0 20px rgba(255, 255, 255, 0.08);
+    }
+
+    .category-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .category-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.75rem;
+        align-items: start;
+    }
+
+    .category-name {
+        color: #0f172a;
+        font-size: 0.9rem;
+        font-weight: 700;
+        display: flex;
+        gap: 0.55rem;
+        align-items: center;
+    }
+
+    .category-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        flex: 0 0 9px;
+    }
+
+    .category-meta {
+        color: #94a3b8;
+        font-size: 0.82rem;
+        margin: 0.35rem 0 0 1.45rem;
+    }
+
+    .category-percent {
+        color: #020617;
+        font-size: 0.88rem;
+        font-weight: 800;
+    }
+
+    .compact-list {
+        display: grid;
+        gap: 0.85rem;
+    }
+
+    .compact-item {
+        border-left: 4px solid #10b981;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 0.9rem 1rem;
+    }
+
+    .compact-title {
+        color: #0f172a;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+    }
+
+    .compact-meta {
+        color: #64748b;
+        font-size: 0.84rem;
+        line-height: 1.45;
+    }
+
+    .empty-state {
+        color: #94a3b8;
+        padding: 1.6rem;
+        text-align: center;
+        background: #f8fafc;
+        border-radius: 10px;
+    }
+
+    @media (max-width: 1100px) {
+        .kpi-grid,
+        .dashboard-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .dashboard-grid > .analytics-card:first-child {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 760px) {
+        .dashboard-hero,
+        .kpi-grid,
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+            display: grid;
+        }
+
+        .chart-bars {
+            gap: 0.45rem;
+        }
+
+        .bar-label {
+            font-size: 0.68rem;
+        }
+    }
+</style>
+
+<div class="dashboard-hero">
+    <div>
+        <h1 class="dashboard-title">Analytics</h1>
+        <p class="dashboard-subtitle">Ventas y operación de {% if user.is_superuser and not school_user %}todos los colegios{% else %}{{ dashboard_scope }}{% endif %}</p>
+    </div>
+    <span class="scope-pill">{% if user.is_superuser and not school_user %}Vista admin global{% else %}{{ dashboard_scope }}{% endif %}</span>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">Ventas totales</div>
+        <div class="kpi-number">${{ stats.total_sales|floatformat:0 }}</div>
+        <div class="kpi-footnote">{{ stats.sales_transactions }} transacciones registradas</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Categoría líder</div>
+        <div class="kpi-number">{{ stats.top_category }}</div>
+        <div class="kpi-footnote">Según ingresos por ventas</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Estudiantes</div>
+        <div class="kpi-number">{{ stats.total_students }}</div>
+        <div class="kpi-footnote">{% if user.is_superuser and not school_user %}En todos los colegios{% else %}Del colegio{% endif %}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Alertas pendientes</div>
+        <div class="kpi-number">{{ stats.unread_notifications }}</div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div>
+        <section class="analytics-card">
+            <div class="analytics-card-header">Tendencia de ventas {{ current_year }}</div>
+            <div class="bar-chart">
+                <div class="chart-axis">
+                    <span>Max</span>
+                    <span>75%</span>
+                    <span>50%</span>
+                    <span>25%</span>
+                    <span>0</span>
+                </div>
+                <div class="chart-bars">
+                    {% for month in monthly_sales %}
+                    <div class="bar-item" title="{{ month.name }}: ${{ month.total|floatformat:0 }}">
+                        <div class="bar-fill" style="height: {{ month.height }}%;"></div>
+                        <div class="bar-label">{{ month.name }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section class="analytics-card">
+            <div class="analytics-card-header">Notificaciones recientes</div>
+            {% if unread_notifications %}
+            <div class="compact-list">
+                {% for notification in unread_notifications %}
+                <div class="compact-item">
+                    <div class="compact-title">{{ notification.title }}</div>
+                    <div class="compact-meta">
+                        {{ notification.get_type_display }} · {{ notification.created_at|date:"d/m/Y H:i" }}
+                        {% if notification.user %}· {{ notification.user.user.username }}{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="margin-top: 1rem;">
+                <a href="{% url 'school:notifications' %}" class="btn btn-primary">Ver notificaciones</a>
+                {% if user.is_superuser or perms.school.can_view_dashboard %}
+                <a href="{% url 'school:metrics' %}" class="btn btn-outline-secondary" style="margin-left: 0.5rem;">📊 Ver métricas</a>
+                {% endif %}
+                {% if not user.is_superuser or school_user %}
+                <a href="{% url 'school:notifications_read_all' %}" class="btn btn-secondary" style="margin-left: 0.5rem;">Marcar leídas</a>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="empty-state">No hay notificaciones pendientes.</div>
+            {% endif %}
+        </section>
+    </div>
+
+    <aside>
+        <section class="analytics-card">
+            <div class="analytics-card-header">Ventas por categoría</div>
+            <div class="pie-wrap">
+                <div class="pie-chart" aria-label="Ventas por categoría"></div>
+            </div>
+            {% if category_sales %}
+            <div class="category-list">
+                {% for category in category_sales %}
+                <div class="category-row">
+                    <div>
+                        <div class="category-name">
+                            <span class="category-dot" style="background: {{ category.color }};"></span>
+                            {{ category.name }}
+                        </div>
+                        <div class="category-meta">${{ category.total|floatformat:0 }} · {{ category.quantity }} productos</div>
+                    </div>
+                    <div class="category-percent">{{ category.percent }}%</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">Todavía no hay ventas para graficar.</div>
+            {% endif %}
+        </section>
+
+        <section class="analytics-card">
+            <div class="analytics-card-header">Notificaciones por tipo</div>
+            <div class="compact-list">
+                <div class="compact-item">
+                    <div class="compact-title">Stock</div>
+                    <div class="compact-meta">{{ notification_stats.stock }} pendientes</div>
+                </div>
+                <div class="compact-item">
+                    <div class="compact-title">Alérgenos</div>
+                    <div class="compact-meta">{{ notification_stats.allergen }} pendientes</div>
+                </div>
+            </div>
+        </section>
+    </aside>
+</div>
+{% endblock %}

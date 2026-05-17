@@ -1,0 +1,123 @@
+{% extends 'school/base.html' %}
+
+{% block title %}Métricas del Sistema - BioFood{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 2rem auto;">
+    <div class="card">
+        <div class="card-header">
+            <h3>📊 Métricas de Endpoints</h3>
+            <p class="text-muted">Monitoreo de rendimiento y disponibilidad</p>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Total registradas</h5>
+                            <p class="display-4 fw-bold">{{ total_count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Últimas 24h</h5>
+                            <p class="display-4 fw-bold">{{ last_24h }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Última métrica</h5>
+                            <p class="display-4 fw-bold">{{ metrics.0.created_at|time:"H:i:s" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#resumenCollapse" aria-expanded="false" aria-controls="resumenCollapse">
+                    📊 Resumen por endpoint
+                </button>
+            </div>
+            <div class="collapse" id="resumenCollapse">
+                <div class="table-responsive mb-4">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Req</th>
+                                <th>Promedio (ms)</th>
+                                <th>Promedio (s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in summary %}
+                            <tr>
+                                <td>{{ s.endpoint }}</td>
+                                <td>{{ s.total_req }}</td>
+                                <td>{{ s.avg_ms|floatformat:0 }}</td>
+                                <td>{{ s.avg_ms|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-secondary">
+                            <tr>
+                                <td><strong>Global</strong></td>
+                                <td>{{ total_count }}</td>
+                                <td><strong>{{ overall_avg|floatformat:0 }}</strong></td>
+                                <td><strong>{{ overall_avg|floatformat:2 }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <h4 class="mb-3">Detalles recientes</h4>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Endpoint</th>
+                            <th>Método</th>
+                            <th>Status</th>
+                            <th>Tiempo (ms)</th>
+                            <th>Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in metrics %}
+                        <tr>
+                            <td>{{ m.endpoint }}</td>
+                            <td><span class="badge bg-primary">{{ m.method }}</span></td>
+                            <td>
+                                {% if m.status_code >= 200 and m.status_code < 300 %}
+                                    <span class="badge bg-success">{{ m.status_code }}</span>
+                                {% elif m.status_code >= 400 and m.status_code < 500 %}
+                                    <span class="badge bg-warning">{{ m.status_code }}</span>
+                                {% elif m.status_code >= 500 %}
+                                    <span class="badge bg-danger">{{ m.status_code }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ m.status_code }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ m.response_time_ms|floatformat:0 }} ms</td>
+                            <td>{{ m.created_at|date:"d/m H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="{% url 'school:dashboard' %}" class="btn btn-outline-secondary">
+                    ← Volver al dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
