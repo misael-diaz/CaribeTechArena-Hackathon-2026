@@ -38,6 +38,10 @@ class AIService:
             from chat.skill.get_healthy_recommendations.tool import get_healthy_recommendations
             from chat.skill.get_balance_forecast.tool import get_balance_forecast
             from chat.skill.get_product_nutrition.tool import get_product_nutrition
+            from chat.skill.check_allergen_safety.tool import check_allergen_safety
+            from chat.skill.suggest_healthy_alternatives.tool import suggest_healthy_alternatives
+            from chat.skill.get_student_summary.tool import get_student_summary, get_multi_student_summary
+            from chat.skill.approve_loan.tool import approve_loan, get_pending_loans, get_loan_summary
 
             self.tools = [
                 get_one_today_meals,
@@ -47,7 +51,14 @@ class AIService:
                 get_recent_recharges,
                 get_healthy_recommendations,
                 get_balance_forecast,
-                get_product_nutrition
+                get_product_nutrition,
+                check_allergen_safety,
+                suggest_healthy_alternatives,
+                get_student_summary,
+                get_multi_student_summary,
+                approve_loan,
+                get_pending_loans,
+                get_loan_summary
             ]
             
             from deepagents.backends.filesystem import FilesystemBackend

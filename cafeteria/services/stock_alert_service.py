@@ -3,9 +3,19 @@ from typing import List, Optional
 from django.db.models import F
 from django.utils import timezone
 from cafeteria.models import Inventory, CafeteriaAdmin
-from chat.services import TwilioService
 
 logger = logging.getLogger(__name__)
+
+
+class TwilioServiceWrapper:
+    """Wrapper para TwilioService para evitar circular imports."""
+
+    def __init__(self):
+        from chat.twilio_service import TwilioService as _TwilioService
+        self._service = _TwilioService()
+
+    def send_message(self, to_number, body):
+        return self._service.send_message(to_number, body)
 
 
 class StockAlertService:
@@ -92,8 +102,8 @@ class StockAlertService:
         )
 
         try:
-            # Enviar mensaje vía Twilio/WhatsApp
-            twilio_service = TwilioService()
+            # Enviar mensaje via Twilio/WhatsApp
+            twilio_service = TwilioServiceWrapper()
             message_sid = twilio_service.send_message(phone, message)
 
             if message_sid:
