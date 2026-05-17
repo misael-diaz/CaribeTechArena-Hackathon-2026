@@ -1,9 +1,12 @@
 import os
+import time
+import logging
 from langchain.agents import create_agent
 from langchain_deepseek import ChatDeepSeek
 from deepagents import create_deep_agent, SubAgent
 
-
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 class AIService:
     def __init__(self):
         self.api_key = os.getenv('PROVIDER_API_KEY')
@@ -83,6 +86,7 @@ class AIService:
 
         try:
             # Using the invoke pattern from the snippet
+            start_time = time.time()
             result = self.agent.invoke(
                 {
                     "messages": [
@@ -94,6 +98,9 @@ class AIService:
                 },
                 config={"configurable": {"thread_id": parent_phone or "default_thread"}}
             )
+            end_time = time.time()
+            duration = end_time - start_time
+            logger.info(f"Agent processed request for {parent_phone} in {duration:.2f} segundos")
             
             # Handle the result (result is usually a dict or an object with content)
             if isinstance(result, dict):
