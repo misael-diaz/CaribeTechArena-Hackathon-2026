@@ -68,6 +68,14 @@ class AIService:
         if not self.agent:
             return "Lo siento, el agente no está configurado."
 
+        if parent_phone:
+            from parent.models import Parent
+            if not Parent.objects.filter(phone_e164=parent_phone).exists():
+                return (f"El número {parent_phone} no está registrado en el sistema de BioFood "
+                        "como un padre o tutor vinculado.\n\n"
+                        "Por favor, comunícate con la administración de la escuela para registrar "
+                        "tu número en la plataforma y acceder a los servicios.")
+
         # Add context to input
         content = user_input
         if parent_phone:
