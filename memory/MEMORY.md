@@ -1,0 +1,4 @@
+- [Allergen Alert Architecture](project_allergen_alerts.md) — Arquitectura de alertas de alérgenos con Signals + Cron fallback
+- [Stock Alert Architecture](project_stock_alerts.md) — Arquitectura de alertas de stock crítico con Signals + Cron fallback
+- [Balance Forecast with Pandas](project_balance_forecast.md) — Calculo avanzado de forecast de saldo con pandas, tendencias y patrones
+- [Nutrition Facts Models](project_nutrition_models.md) — Modelo NutritionFact para informacion nutricional + tool chatbot

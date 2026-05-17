@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'parent',
     'cafeteria',
     'chat',
-    'admin_tools_stats',
+    # 'admin_tools_stats',  # Commented out - module not installed
 ]
 
 X_FRAME_OPTIONS = 'SAMEORIGIN' # Required by admin_interface
