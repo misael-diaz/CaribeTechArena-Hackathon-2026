@@ -22,8 +22,40 @@ __pycache__/
 Thumbs.db
 
 # Temporary scripts
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Env
+.env*
+venv/
+ENV/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary scripts
 inspect_db.py
 test_perms.py
 find_access.py
 database_structure.txt
 *.pyc
+
+# Tests and UTs
+test_*.py
+*_test.py
+tests.py
+test_*
+*.txt
+agent_*
