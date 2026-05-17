@@ -200,3 +200,177 @@ class US01ConsultaConversacionalTest(TestCase):
 
         # Debería indicar que no hay compras hoy
         self.assertIn("no ha registrado compras hoy", result.lower())
+
+
+# ============================================================================
+# US-06: Alerta nutricional diaria
+# ============================================================================
+
+from chat.skill.get_daily_nutrition_summary.tool import get_daily_nutrition_summary
+from product.models import NutritionFact
+
+
+class US06DailyNutritionSummaryTest(TestCase):
+    """Tests para US-06: Resumen nutricional diario."""
+
+    def setUp(self):
+        self.school = School.objects.create(name="Colegio Test", nit="12345")
+        self.student = Student.objects.create(
+            name="Juan Perez",
+            school=self.school,
+            balance=Decimal("15000.00")
+        )
+        self.parent = Parent.objects.create(
+            phone_e164="+573001234567",
+            name="Carlos Perez"
+        )
+        self.parent.students.add(self.student)
+        
+        # Crear producto con flags nutricionales
+        self.product = Product.objects.create(
+            name="Coca-Cola",
+            category="Bebidas",
+            price=Decimal("1500.00")
+        )
+        NutritionFact.objects.create(
+            product_name="Coca-Cola",
+            high_sugar=True,
+            high_sodium=False,
+            high_fat=False
+        )
+
+    def test_daily_nutrition_summary_with_transactions(self):
+        """Resumen nutricional muestra calorías y flags correctamente."""
+        Transaction.objects.create(
+            student=self.student,
+            product=self.product,
+            quantity=2,
+            price=Decimal("1500.00"),
+            created_at=timezone.now()
+        )
+
+        result = get_daily_nutrition_summary.invoke({
+            "parent_phone": "+573001234567",
+            "student_name": "Juan"
+        })
+
+        self.assertIn("Calorías estimadas", result)
+        self.assertIn("azúcar", result)
+        self.assertIn("sodio", result)
+        self.assertIn("grasa", result)
+
+    def test_daily_nutrition_summary_no_transactions(self):
+        """Resumen retorna mensaje cuando no hay transacciones."""
+        result = get_daily_nutrition_summary.invoke({
+            "parent_phone": "+573001234567",
+            "student_name": "Juan"
+        })
+
+        self.assertIn("no ha registrado compras hoy", result.lower())
+
+
+# ============================================================================
+# US-07: Recomendaciones personalizadas en resumen
+# ============================================================================
+
+from chat.skill.get_student_summary.tool import get_student_summary
+
+
+class US07StudentSummaryRecommendationsTest(TestCase):
+    """Tests para recomendaciones personalizadas en get_student_summary."""
+
+    def setUp(self):
+        self.school = School.objects.create(name="Colegio Test", nit="12345")
+        self.student = Student.objects.create(
+            name="Juan Perez",
+            school=self.school,
+            balance=Decimal("3000.00")
+        )
+        self.parent = Parent.objects.create(
+            phone_e164="+573001234567",
+            name="Carlos Perez"
+        )
+        self.parent.students.add(self.student)
+        
+        # Producto alto en azúcar
+        self.product_sugar = Product.objects.create(
+            name="Coca-Cola",
+            category="Bebidas",
+            price=Decimal("1500.00")
+        )
+        
+        # Producto con alérgeno
+        self.product_allergen = Product.objects.create(
+            name="Detodito",
+            category="Snacks",
+            price=Decimal("2000.00")
+        )
+        
+        # Alergeno del estudiante
+        from student.models import StudentAllergen
+        StudentAllergen.objects.create(
+            student=self.student,
+            allergen_name="Mani"
+        )
+
+    def test_summary_with_urgent_reload_recommendation(self):
+        """Resumen incluye recarga urgente si forecast < 5 días."""
+        # Simular historial de gasto para que el forecast diga < 5 días
+        from transaction.models import Transaction
+        for i in range(5):
+            Transaction.objects.create(
+                student=self.student,
+                product=self.product_sugar,
+                quantity=1,
+                price=Decimal("1500.00"),
+                created_at=timezone.now() - timezone.timedelta(days=i)
+            )
+
+        result = get_student_summary.invoke({
+            "parent_phone": "+573001234567",
+            "student_name": "Juan"
+        })
+
+        self.assertIn("RECARGA URGENTE", result)
+        self.assertIn("cubre solo", result)
+
+    def test_summary_with_sugar_pattern_recommendation(self):
+        """Resumen incluye patrón de consumo si compra mucho azúcar."""
+        # 3 compras de coca-cola
+        from transaction.models import Transaction
+        for i in range(3):
+            Transaction.objects.create(
+                student=self.student,
+                product=self.product_sugar,
+                quantity=1,
+                price=Decimal("1500.00"),
+                created_at=timezone.now() - timezone.timedelta(days=i)
+            )
+
+        result = get_student_summary.invoke({
+            "parent_phone": "+573001234567",
+            "student_name": "Juan"
+        })
+
+        self.assertIn("PATRÓN DE CONSUMO", result)
+        self.assertIn("productos altos en azúcar", result)
+
+    def test_summary_with_allergen_alert(self):
+        """Resumen incluye alerta alérgeno si compró producto peligroso."""
+        # Compra de detodito (contiene maní)
+        from transaction.models import Transaction
+        Transaction.objects.create(
+            student=self.student,
+            product=self.product_allergen,
+            quantity=1,
+            price=Decimal("2000.00"),
+            created_at=timezone.now()
+        )
+
+        result = get_student_summary.invoke({
+            "parent_phone": "+573001234567",
+            "student_name": "Juan"
+        })
+
+        self.assertIn("ALERTA ALÉRGENO", result)
+        self.assertIn("detodito", result.lower())

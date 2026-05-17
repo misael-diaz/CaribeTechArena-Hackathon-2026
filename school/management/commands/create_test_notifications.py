@@ -25,20 +25,6 @@ class Command(BaseCommand):
 
         # Crear notificaciones de prueba
         notifications_data = [
-            # Prestamos
-            {
-                'title': 'Nuevo prestamo solicitado',
-                'message': 'Juanito Perez solicito un prestamo de $5.00 porque se le agoto el saldo.',
-                'priority': 'HIGH',
-                'type': 'LOAN',
-                'action_url': '/transaction/api/loan/pending/'
-            },
-            {
-                'title': 'Prestamo aprobado',
-                'message': 'Maria Rodriguez aprobo el prestamo de $3.50 para su hijo Carlos.',
-                'priority': 'MEDIUM',
-                'type': 'LOAN',
-            },
             # Stock
             {
                 'title': 'Stock critico: Gaseosa Coca-Cola',

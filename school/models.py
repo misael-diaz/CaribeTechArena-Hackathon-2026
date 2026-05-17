@@ -35,7 +35,6 @@ class SchoolUser(models.Model):
         permissions = [
             ('can_view_dashboard', 'Puede ver dashboard'),
             ('can_view_notifications', 'Puede ver notificaciones'),
-            ('can_manage_loans', 'Puede gestionar préstamos'),
             ('can_manage_inventory', 'Puede gestionar inventario'),
         ]
 
@@ -59,7 +58,6 @@ class Notification(models.Model):
     )
 
     TYPE_CHOICES = (
-        ('LOAN', 'Préstamo'),
         ('STOCK', 'Stock'),
         ('ALLERGEN', 'Alérgeno'),
         ('BALANCE', 'Saldo'),
@@ -118,3 +116,30 @@ class AlertConfiguration(models.Model):
 
     def __str__(self):
         return f"{self.school.name} - {self.get_alert_type_display()} @ {self.trigger_time}"
+
+
+class EndpointMetric(models.Model):
+    """
+    Métricas de endpoints HTTP (tiempo, status, método).
+    Usado para monitoreo sin impacto en rendimiento.
+    """
+    endpoint = models.CharField(max_length=255, db_index=True)
+    method = models.CharField(max_length=10)
+    status_code = models.PositiveSmallIntegerField()
+    response_time_ms = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Métrica de Endpoint"
+        verbose_name_plural = "Métricas de Endpoints"
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['endpoint']),
+            models.Index(fields=['method']),
+            models.Index(fields=['status_code']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.method} {self.endpoint} → {self.status_code} ({self.response_time_ms:.0f}ms)"
+

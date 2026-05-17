@@ -10,6 +10,6 @@ urlpatterns = [
     path('dashboard/', views.school_dashboard, name='dashboard'),
     path('sales/new/', views.create_sale, name='create_sale'),
     path('notifications/', views.notifications_list, name='notifications'),
-    path('notifications/<int:notification_id>/read/', views.mark_notification_read, name='notification_read'),
-    path('notifications/read-all/', views.mark_all_notifications_read, name='notifications_read_all'),
+    path('notifications/<int:notification_id>/read/', views.mark_notification_as_read, name='notification_read'),
+    path('metrics/', views.metrics_list, name='metrics'),
 ]

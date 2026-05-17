@@ -22,35 +22,13 @@ class Command(BaseCommand):
 
         for school in schools:
             self.stdout.write(f'\nProcesando colegio: {school.name}')
-            
-            # 1. Notificaciones de préstamos pendientes
-            pending_loans = Loan.objects.filter(
-                parent__students__school=school,
-                status='PENDING'
-            ).select_related('student', 'parent').order_by('-created_at')[:10]
-            
-            for loan in pending_loans:
-                notification, created = Notification.objects.get_or_create(
-                    school=school,
-                    type='LOAN',
-                    metadata__loan_id=loan.id,
-                    defaults={
-                        'title': f'Prestamo pendiente: {loan.student.name}',
-                        'message': f'{loan.student.name} solicito ${loan.amount}. Padre: {loan.parent.name or loan.parent.phone_e164}',
-                        'priority': 'HIGH',
-                        'action_url': f'/transaction/api/loan/approve/{loan.approval_token}/'
-                    }
-                )
-                if created:
-                    total_created += 1
-                    self.stdout.write(self.style.SUCCESS(f'  ✓ Prestamo: {loan.student.name} - ${loan.amount}'))
 
             # 2. Notificaciones de stock crítico
             critical_inventory = Inventory.objects.filter(
                 school=school,
                 current_stock__lte=0
             ).select_related('product').order_by('current_stock')[:10]
-            
+
             for inv in critical_inventory:
                 notification, created = Notification.objects.get_or_create(
                     school=school,
@@ -73,7 +51,7 @@ class Command(BaseCommand):
                 current_stock__gt=0,
                 current_stock__lte=F('minimum_stock')
             ).select_related('product').order_by('current_stock')[:10]
-            
+
             for inv in low_inventory:
                 notification, created = Notification.objects.get_or_create(
                     school=school,
@@ -96,7 +74,7 @@ class Command(BaseCommand):
                 student__school=school,
                 created_at__gte=timezone.now() - timedelta(hours=24)
             ).select_related('student', 'product').order_by('-created_at')[:10]
-            
+
             for t in allergen_transactions:
                 # Verificar si hay alérgenos en común
                 student_allergens = set(
@@ -104,14 +82,14 @@ class Command(BaseCommand):
                     .filter(student=t.student)
                     .values_list('allergen_name', flat=True)
                 )
-                
+
                 if student_allergens:
                     product_allergens = set(
                         t.product.allergens.values_list('allergen_name', flat=True)
                     )
-                    
+
                     matching = student_allergens & product_allergens
-                    
+
                     if matching:
                         notification, created = Notification.objects.get_or_create(
                             school=school,

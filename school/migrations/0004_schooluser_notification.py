@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Usuario de Colegio',
                 'verbose_name_plural': 'Usuarios de Colegio',
-                'permissions': [('can_view_dashboard', 'Puede ver dashboard'), ('can_view_notifications', 'Puede ver notificaciones'), ('can_manage_loans', 'Puede gestionar préstamos'), ('can_manage_inventory', 'Puede gestionar inventario')],
+                'permissions': [('can_view_dashboard', 'Puede ver dashboard'), ('can_view_notifications', 'Puede ver notificaciones'), ('can_manage_inventory', 'Puede gestionar inventario')],
             },
         ),
         migrations.CreateModel(
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=255)),
                 ('message', models.TextField()),
                 ('priority', models.CharField(choices=[('LOW', 'Baja'), ('MEDIUM', 'Media'), ('HIGH', 'Alta'), ('CRITICAL', 'Crítica')], default='MEDIUM', max_length=10)),
-                ('type', models.CharField(choices=[('LOAN', 'Préstamo'), ('STOCK', 'Stock'), ('ALLERGEN', 'Alérgeno'), ('BALANCE', 'Saldo'), ('GENERAL', 'General')], default='GENERAL', max_length=20)),
+                ('type', models.CharField(choices=[('STOCK', 'Stock'), ('ALLERGEN', 'Alérgeno'), ('BALANCE', 'Saldo'), ('GENERAL', 'General')], default='GENERAL', max_length=20)),
                 ('is_read', models.BooleanField(default=False)),
                 ('read_at', models.DateTimeField(blank=True, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),

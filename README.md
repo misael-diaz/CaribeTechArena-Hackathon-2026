@@ -63,5 +63,17 @@ python manage.py runserver
 ```
 Accede al panel de administración en: `http://127.0.0.1:8000/admin/`
 
+## Features Clave
+
+| Feature | Estado | Descripción |
+|---------|--------|-------------|
+| ✅ US-01 — Consulta conversacional padre | Implementado | "¿Qué comió Juan hoy?" → responde en tiempo real |
+| ✅ US-02 — Alerta ausencia consumo | Implementado | Envía WhatsApp si no compró nada antes del mediodía |
+| ✅ US-03 — Alerta crítica alérgeno | Implementado | Trigger inmediato + fallback cron (Signal + Cron) |
+| ✅ US-04 — Proyección saldo | Implementado | Calcula fecha de agotamiento con pandas y margen ±2 días |
+| ✅ US-05 — Alerta stock crítico | Implementado | Notifica a admins cuando stock ≤ mínimo |
+| ⏳ US-06 — Resumen nutricional diario | En desarrollo | Próximo: resumen de calorías y nutrientes por estudiante |
+| ⏳ US-07 — Recomendaciones personalizadas | En desarrollo | Sugerencias basadas en patrones de consumo |
+
 ---
 *Hackathon BioFood 2026 - Alimentando el futuro!*

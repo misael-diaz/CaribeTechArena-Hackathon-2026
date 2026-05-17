@@ -19,9 +19,9 @@ type: project
 **Mensaje WhatsApp que recibe el padre:**
 
 ```
-🔔 SOLICITUD DE PRESTAMO BioFood
+[ALERTA] SOLICITUD DE PRESTAMO BioFood
 
-Tu hijo/a Juanito se quedo sin saldo y solicita 
+Tu hijo/a Juanito se quedo sin saldo y solicita
 un prestamo de $5.00.
 
 ¿Quieres aprobar este prestamo?

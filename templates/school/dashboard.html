@@ -329,6 +329,9 @@
             </div>
             <div style="margin-top: 1rem;">
                 <a href="{% url 'school:notifications' %}" class="btn btn-primary">Ver notificaciones</a>
+                {% if is_superuser or request.user.has_perm('school.can_view_dashboard') %}
+                <a href="{% url 'school:metrics' %}" class="btn btn-outline-secondary" style="margin-left: 0.5rem;">📊 Ver métricas</a>
+                {% endif %}
                 {% if not is_superuser or school_user %}
                 <a href="{% url 'school:notifications_read_all' %}" class="btn btn-secondary" style="margin-left: 0.5rem;">Marcar leídas</a>
                 {% endif %}

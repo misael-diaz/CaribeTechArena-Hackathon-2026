@@ -107,10 +107,7 @@ class SchoolUserRegistrationForm(UserCreationForm):
         
         # Permisos adicionales segun rol
         if role == 'ADMIN':
-            permissions.extend([
-                'can_manage_loans',
-                'can_manage_inventory',
-            ])
+            permissions.append('can_manage_inventory')
         elif role == 'CAFETERIA':
             permissions.append('can_manage_inventory')
         
