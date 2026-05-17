@@ -27,19 +27,20 @@ class AIService:
             except Exception:
                 self.full_prompt = "You are a BioFood Assistant."
 
-            # Define tools
             from chat.skill.get_one_today_meals.tool import get_one_today_meals
             from chat.skill.get_childs.tool import get_childs
             from chat.skill.get_student_balance.tool import get_student_balance
             from chat.skill.get_student_allergens.tool import get_student_allergens
             from chat.skill.get_recent_recharges.tool import get_recent_recharges
+            from chat.skill.get_healthy_recommendations.tool import get_healthy_recommendations
             
             self.tools = [
                 get_one_today_meals, 
                 get_childs, 
                 get_student_balance, 
                 get_student_allergens, 
-                get_recent_recharges
+                get_recent_recharges,
+                get_healthy_recommendations
             ]
             
             from deepagents.backends.filesystem import FilesystemBackend
