@@ -34,12 +34,12 @@ class StockAlertServiceTest(TestCase):
     def test_check_and_alert_with_critical_stock(self):
         """El servicio envía alerta cuando current_stock <= minimum_stock."""
         service = StockAlertService()
-        
-        with patch('cafeteria.services.stock_alert_service.TwilioService') as mock_twilio:
+
+        with patch('chat.twilio_service.TwilioService') as mock_twilio:
             mock_twilio.return_value.send_message.return_value = 'SM123456'
-            
+
             alerts = service.check_and_alert(self.inventory)
-            
+
             self.assertEqual(len(alerts), 1)
             self.assertEqual(alerts[0]['status'], 'sent')
             self.assertEqual(alerts[0]['admin_phone'], '+573001234567')
@@ -71,37 +71,37 @@ class StockAlertServiceTest(TestCase):
             phone_e164='+573009876543',
             school=self.school
         )
-        
+
         service = StockAlertService()
-        
-        with patch('cafeteria.services.stock_alert_service.TwilioService') as mock_twilio:
+
+        with patch('chat.twilio_service.TwilioService') as mock_twilio:
             mock_twilio.return_value.send_message.return_value = 'SM123456'
-            
+
             alerts = service.check_and_alert(self.inventory)
-            
+
             self.assertEqual(len(alerts), 2)
 
     def test_mock_status_when_twilio_not_configured(self):
         """El servicio retorna status 'mock' cuando Twilio no está configurado."""
         service = StockAlertService()
-        
-        with patch('cafeteria.services.stock_alert_service.TwilioService') as mock_twilio:
+
+        with patch('chat.twilio_service.TwilioService') as mock_twilio:
             mock_twilio.return_value.send_message.return_value = None
-            
+
             alerts = service.check_and_alert(self.inventory)
-            
+
             self.assertEqual(len(alerts), 1)
             self.assertEqual(alerts[0]['status'], 'mock')
 
     def test_failed_status_when_exception(self):
         """El servicio retorna status 'failed' cuando hay excepción."""
         service = StockAlertService()
-        
-        with patch('cafeteria.services.stock_alert_service.TwilioService') as mock_twilio:
+
+        with patch('chat.twilio_service.TwilioService') as mock_twilio:
             mock_twilio.return_value.send_message.side_effect = Exception('Connection error')
-            
+
             alerts = service.check_and_alert(self.inventory)
-            
+
             self.assertEqual(len(alerts), 1)
             self.assertEqual(alerts[0]['status'], 'failed')
             self.assertIn('error', alerts[0])
@@ -114,14 +114,14 @@ class StockAlertServiceTest(TestCase):
             current_stock=3,
             minimum_stock=8
         )
-        
+
         service = StockAlertService()
-        
-        with patch('cafeteria.services.stock_alert_service.TwilioService') as mock_twilio:
+
+        with patch('chat.twilio_service.TwilioService') as mock_twilio:
             mock_twilio.return_value.send_message.return_value = 'SM123456'
-            
+
             all_alerts = service.check_all_critical_stock()
-            
+
             self.assertEqual(len(all_alerts), 2)
 
 

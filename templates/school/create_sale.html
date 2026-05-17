@@ -1,0 +1,193 @@
+{% extends 'school/base.html' %}
+
+{% block title %}Registrar venta - BioFood{% endblock %}
+
+{% block content %}
+<style>
+    .sale-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 420px) 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .page-title {
+        color: #0f172a;
+        font-size: 1.9rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.35rem;
+    }
+
+    .page-subtitle {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+    }
+
+    .sale-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+        padding: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        color: #0f172a;
+        font-weight: 800;
+        margin-bottom: 0.45rem;
+    }
+
+    .form-control {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        color: #0f172a;
+        padding: 0.7rem 0.8rem;
+        font-size: 0.95rem;
+    }
+
+    .form-control:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16);
+        outline: none;
+    }
+
+    .errorlist {
+        color: #991b1b;
+        background: #fee2e2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        list-style: none;
+        padding: 0.8rem 1rem;
+        margin: 0 0 1rem;
+        font-weight: 600;
+    }
+
+    .sales-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .sales-table th,
+    .sales-table td {
+        padding: 0.85rem;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
+    }
+
+    .sales-table th {
+        color: #64748b;
+        background: #f8fafc;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+    }
+
+    .sales-table td {
+        color: #0f172a;
+    }
+
+    .empty-state {
+        color: #94a3b8;
+        padding: 2rem;
+        text-align: center;
+        background: #f8fafc;
+        border-radius: 10px;
+    }
+
+    @media (max-width: 900px) {
+        .sale-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<h1 class="page-title">Registrar venta</h1>
+<p class="page-subtitle">Crea una venta para el kiosco, descuenta saldo del estudiante y baja el stock de la escuela.</p>
+
+<div class="sale-layout">
+    <section class="sale-card">
+        <div class="card-header">Nueva venta</div>
+        {% if is_superuser %}
+        <form method="get" style="margin-bottom: 1rem;">
+            <div class="form-group">
+                {{ form.school.label_tag }}
+                {{ form.school }}
+            </div>
+            <button type="submit" class="btn btn-secondary" style="width: 100%;">Elegir escuela</button>
+        </form>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% if is_superuser %}
+            <input type="hidden" name="school" value="{{ selected_school.id|default:'' }}">
+            {% endif %}
+
+            <div class="form-group">
+                {{ form.student.label_tag }}
+                {{ form.student }}
+                {{ form.student.errors }}
+            </div>
+
+            <div class="form-group">
+                {{ form.inventory.label_tag }}
+                {{ form.inventory }}
+                {{ form.inventory.errors }}
+            </div>
+
+            <div class="form-group">
+                {{ form.quantity.label_tag }}
+                {{ form.quantity }}
+                {{ form.quantity.errors }}
+            </div>
+
+            {% if is_superuser and not selected_school %}
+            <div class="empty-state" style="margin-bottom: 1rem;">Primero elige una escuela para ver estudiantes y stock.</div>
+            {% elif not has_inventory %}
+            <div class="empty-state" style="margin-bottom: 1rem;">Esta escuela no tiene productos con stock disponible.</div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;" {% if is_superuser and not selected_school or not has_inventory %}disabled{% endif %}>Guardar venta</button>
+        </form>
+    </section>
+
+    <section class="sale-card">
+        <div class="card-header">Ventas recientes</div>
+        {% if recent_sales %}
+        <div style="overflow-x: auto;">
+            <table class="sales-table">
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in recent_sales %}
+                    <tr>
+                        <td>{{ sale.student.name }}</td>
+                        <td>{{ sale.product.name }}</td>
+                        <td>{{ sale.quantity }}</td>
+                        <td>${{ sale.total|floatformat:0 }}</td>
+                        <td>{{ sale.created_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">Todavía no hay ventas registradas.</div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

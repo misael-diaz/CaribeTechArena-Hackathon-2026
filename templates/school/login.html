@@ -1,0 +1,55 @@
+{% extends 'school/base.html' %}
+
+{% block title %}Login - BioFood School{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 3rem auto;">
+    <div class="card">
+        <div class="card-header" style="text-align: center;">
+            🔐 Iniciar Sesión
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    {{ form.username.label }}
+                </label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div style="color: #dc3545; font-size: 0.85rem; margin-top: 0.3rem;">
+                    {{ form.username.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    {{ form.password.label }}
+                </label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <div style="color: #dc3545; font-size: 0.85rem; margin-top: 0.3rem;">
+                    {{ form.password.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                Ingresar
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 1rem; font-size: 0.9rem;">
+            <a href="#" style="color: #667eea; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+        </div>
+    </div>
+    
+    <div class="card" style="text-align: center;">
+        <p style="color: #666; margin-bottom: 1rem;">
+            ¿No tienes una cuenta? Contacta al administrador de tu colegio.
+        </p>
+    </div>
+</div>
+{% endblock %}

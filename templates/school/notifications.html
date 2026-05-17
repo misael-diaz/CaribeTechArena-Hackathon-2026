@@ -1,0 +1,139 @@
+{% extends 'school/base.html' %}
+
+{% block title %}Notificaciones - BioFood{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h1 style="color: #0f172a; font-weight: 700; font-size: 1.75rem;">
+        <svg style="width:1.5rem;height:1.5rem;display:inline;vertical-align:middle;margin-right:0.5rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+        Notificaciones
+    </h1>
+    <div>
+        <a href="{% url 'school:notifications_read_all' %}" class="btn btn-secondary">
+            Marcar todas como leídas
+        </a>
+        <a href="{% url 'school:dashboard' %}" class="btn btn-secondary" style="margin-left: 0.5rem;">
+            Volver al Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card">
+    <form method="get" style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Tipo:</label>
+            <select name="type" class="form-control" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">Todos</option>
+                <option value="LOAN" {% if current_type == 'LOAN' %}selected{% endif %}>Préstamos</option>
+                <option value="STOCK" {% if current_type == 'STOCK' %}selected{% endif %}>Stock</option>
+                <option value="ALLERGEN" {% if current_type == 'ALLERGEN' %}selected{% endif %}>Alérgenos</option>
+                <option value="BALANCE" {% if current_type == 'BALANCE' %}selected{% endif %}>Saldo</option>
+                <option value="GENERAL" {% if current_type == 'GENERAL' %}selected{% endif %}>General</option>
+            </select>
+        </div>
+        
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                <input type="checkbox" name="show_read" value="true" {% if show_read %}checked{% endif %}>
+                Mostrar leídas
+            </label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </form>
+</div>
+
+<!-- Lista de notificaciones -->
+{% if notifications %}
+<div class="card">
+    {% for notification in notifications %}
+    <div class="notification-item priority-{{ notification.priority }}" style="{% if notification.is_read %}opacity: 0.6;{% endif %}">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <strong style="font-size: 1.1rem;">{{ notification.title }}</strong>
+                    {% if notification.is_read %}
+                    <span style="color: #28a745; font-size: 0.85rem;">✓ Leída</span>
+                    {% else %}
+                    <span style="color: #dc3545; font-size: 0.85rem;">● Nueva</span>
+                    {% endif %}
+                </div>
+                
+                <p style="margin: 0.5rem 0; color: #444;">{{ notification.message }}</p>
+                
+                <div class="notification-meta">
+                    <span class="badge badge-{{ notification.type }}">{{ notification.get_type_display }}</span>
+                    <span class="badge" style="background: {% if notification.priority == 'CRITICAL' %}#dc3545{% elif notification.priority == 'HIGH' %}#fd7e14{% elif notification.priority == 'MEDIUM' %}#ffc107{% else %}#6c757d{% endif %}; color: white;">
+                        {{ notification.get_priority_display }}
+                    </span>
+                    {% if notification.user %}
+                    <span style="margin-left: 0.5rem;">
+                        <svg style="width:0.8rem;height:0.8rem;display:inline;vertical-align:middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        {{ notification.user.user.username }}
+                    </span>
+                    {% endif %}
+                    <span style="margin-left: 0.5rem;">
+                        <svg style="width:0.8rem;height:0.8rem;display:inline;vertical-align:middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        {{ notification.created_at|date:"d/m/Y H:i" }}
+                    </span>
+                    {% if notification.read_at %}
+                    <span style="margin-left: 0.5rem; color: #28a745;">
+                        <svg style="width:0.8rem;height:0.8rem;display:inline;vertical-align:middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        Leída: {{ notification.read_at|date:"d/m/Y H:i" }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem;">
+                {% if notification.action_url %}
+                <a href="{{ notification.action_url }}" class="btn btn-primary" style="font-size: 0.85rem;">
+                    Acción
+                </a>
+                {% endif %}
+                
+                {% if not notification.is_read %}
+                <a href="{% url 'school:notification_read' notification.id %}?next={{ request.path }}" 
+                   class="btn btn-secondary" style="font-size: 0.85rem;">
+                    Marcar leída
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <!-- Paginación -->
+    {% if has_next %}
+    <div style="text-align: center; margin-top: 1rem;">
+        <a href="?page={{ next_page }}{% if current_type %}&type={{ current_type }}{% endif %}&show_read={{ show_read|yesno:'true,false' }}" 
+           class="btn btn-primary">
+            Cargar más notificaciones
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 3rem;">
+    <p style="color: #64748b; font-size: 1.1rem;">
+        <svg style="width:2rem;height:2rem;display:inline;vertical-align:middle;margin-right:0.5rem;stroke:#10b981;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        ¡No tienes notificaciones!
+    </p>
+    <p style="color: #94a3b8; margin-top: 0.5rem;">Cuando lleguen notificaciones nuevas, aparecerán aquí.</p>
+    <a href="{% url 'school:dashboard' %}" class="btn btn-primary" style="margin-top: 1rem;">
+        Volver al Dashboard
+    </a>
+</div>
+{% endif %}
+{% endblock %}

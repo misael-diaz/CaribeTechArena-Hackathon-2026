@@ -41,7 +41,6 @@ class AIService:
             from chat.skill.check_allergen_safety.tool import check_allergen_safety
             from chat.skill.suggest_healthy_alternatives.tool import suggest_healthy_alternatives
             from chat.skill.get_student_summary.tool import get_student_summary, get_multi_student_summary
-            from chat.skill.approve_loan.tool import approve_loan, get_pending_loans, get_loan_summary
 
             self.tools = [
                 get_one_today_meals,
@@ -55,10 +54,7 @@ class AIService:
                 check_allergen_safety,
                 suggest_healthy_alternatives,
                 get_student_summary,
-                get_multi_student_summary,
-                approve_loan,
-                get_pending_loans,
-                get_loan_summary
+                get_multi_student_summary
             ]
             
             from deepagents.backends.filesystem import FilesystemBackend

@@ -72,7 +72,7 @@ ROOT_URLCONF = 'Byte.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,6 +83,11 @@ TEMPLATES = [
         },
     },
 ]
+
+# Authentication
+LOGIN_URL = '/school/login/'
+LOGIN_REDIRECT_URL = '/school/dashboard/'
+LOGOUT_REDIRECT_URL = '/school/login/'
 
 WSGI_APPLICATION = 'Byte.wsgi.application'
 

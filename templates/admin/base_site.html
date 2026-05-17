@@ -1,0 +1,412 @@
+{% extends "admin/base_site.html" %}
+
+{% block header %}
+<header id="header" class="biofood-admin-header">
+    <div id="branding">
+        <h1 id="site-name">
+            <a href="{% url 'admin:index' %}">BioFood Admin</a>
+        </h1>
+    </div>
+
+    <nav id="nav-global" class="biofood-admin-nav">
+        <details class="biofood-admin-menu">
+            <summary>Panel BioFood <span class="biofood-admin-badge">ADMIN</span></summary>
+            <div class="biofood-admin-menu-list">
+                <a href="{% url 'school:dashboard' %}">Dashboard</a>
+                <a href="{% url 'school:create_sale' %}">Registrar venta</a>
+                <a href="{% url 'school:notifications' %}">Notificaciones</a>
+                <a href="{% url 'admin:index' %}">Admin Django</a>
+            </div>
+        </details>
+    </nav>
+
+    {% if has_permission %}
+    <div id="user-tools">
+        <span>Hola, <strong>{% firstof user.get_short_name user.get_username %}</strong></span>
+        {% if site_url %}
+        <a href="{{ site_url }}">Ver sitio</a>
+        {% endif %}
+        {% if user.has_usable_password %}
+        <a href="{% url 'admin:password_change' %}">Cambiar clave</a>
+        {% endif %}
+        <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+            {% csrf_token %}
+            <button type="submit">Salir</button>
+        </form>
+        {% include "admin/color_theme_toggle.html" %}
+    </div>
+    {% endif %}
+</header>
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+    :root {
+        --primary: #0f172a;
+        --secondary: #10b981;
+        --accent: #10b981;
+        --header-bg: #0f172a;
+        --header-color: #f8fafc;
+        --header-link-color: #f8fafc;
+        --breadcrumbs-bg: #111827;
+        --breadcrumbs-fg: #d1fae5;
+        --breadcrumbs-link-fg: #ffffff;
+        --button-bg: #10b981;
+        --button-hover-bg: #059669;
+        --default-button-bg: #0f172a;
+        --default-button-hover-bg: #1e293b;
+        --link-fg: #059669;
+        --link-hover-color: #047857;
+        --body-bg: #f1f5f9;
+        --body-fg: #1e293b;
+        --border-color: #e2e8f0;
+        --hairline-color: #e2e8f0;
+        --selected-row: #ecfdf5;
+    }
+
+    body {
+        background: #f1f5f9;
+        color: #1e293b;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    div.breadcrumbs {
+        background: #111827;
+        color: #d1fae5;
+        padding: 12px 32px;
+    }
+
+    div.breadcrumbs a {
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    #content {
+        padding: 32px;
+    }
+
+    #content h1 {
+        color: #0f172a;
+        font-size: 1.85rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .module,
+    .inline-group,
+    #changelist,
+    .submit-row,
+    .paginator,
+    .messagelist li,
+    .login #container {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .module h2,
+    .module caption,
+    .inline-group h2 {
+        background: #ffffff;
+        color: #0f172a;
+        border-bottom: 2px solid #10b981;
+        font-weight: 800;
+        padding: 14px 18px;
+    }
+
+    table thead th,
+    thead th.sorted {
+        background: #f8fafc;
+        color: #475569;
+        border-bottom: 1px solid #e2e8f0;
+        font-weight: 800;
+    }
+
+    tbody tr:nth-child(even) {
+        background: #f8fafc;
+    }
+
+    tbody tr:hover {
+        background: #ecfdf5;
+    }
+
+    a:link,
+    a:visited {
+        color: #059669;
+    }
+
+    a:hover {
+        color: #047857;
+    }
+
+    .object-tools a,
+    input[type=submit],
+    input[type=button],
+    .submit-row input,
+    a.button,
+    .button {
+        background: #10b981;
+        color: #ffffff;
+        border: 0;
+        border-radius: 8px;
+        font-weight: 800;
+        box-shadow: none;
+    }
+
+    input.default,
+    .submit-row input.default {
+        background: #0f172a;
+    }
+
+    input,
+    textarea,
+    select,
+    .vTextField {
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        color: #0f172a;
+    }
+</style>
+{% endblock %}
+
+{% block blockbots %}
+{{ block.super }}
+<style>
+    body.admin-interface .main,
+    body.admin-interface #main,
+    body.admin-interface #container > .main {
+        border-top: 0 !important;
+    }
+
+    body.admin-interface #header.biofood-admin-header,
+    body.admin-interface #container #header.biofood-admin-header {
+        min-height: 58px !important;
+        padding: 0 32px !important;
+        background: #0f172a !important;
+        background-color: #0f172a !important;
+        border-bottom: 1px solid rgba(248, 250, 252, 0.72) !important;
+        box-shadow: none !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 1.75rem !important;
+    }
+
+    body.admin-interface #branding {
+        float: none !important;
+        min-width: 245px !important;
+        margin: 0 !important;
+        order: 1 !important;
+    }
+
+    body.admin-interface #branding h1 {
+        margin: 0 !important;
+        line-height: 58px !important;
+    }
+
+    body.admin-interface #branding h1 a,
+    body.admin-interface #branding h1 a:link,
+    body.admin-interface #branding h1 a:visited {
+        color: #10b981 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.65rem !important;
+        font-size: 1.45rem !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.02em !important;
+        text-decoration: none !important;
+    }
+
+    body.admin-interface #branding h1 a::before {
+        content: "" !important;
+        display: inline-block !important;
+        width: 28px !important;
+        height: 28px !important;
+        background: #10b981 !important;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18.36 6.64a9 9 0 1 1-12.73 0'/%3E%3Cline x1='12' y1='2' x2='12' y2='12'/%3E%3C/svg%3E") center / contain no-repeat !important;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18.36 6.64a9 9 0 1 1-12.73 0'/%3E%3Cline x1='12' y1='2' x2='12' y2='12'/%3E%3C/svg%3E") center / contain no-repeat !important;
+    }
+
+    body.admin-interface #nav-global.biofood-admin-nav {
+        order: 2 !important;
+        flex: 1 1 auto !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        min-height: 58px !important;
+        margin: 0 !important;
+        float: none !important;
+    }
+
+    body.admin-interface .biofood-admin-menu {
+        position: relative !important;
+    }
+
+    body.admin-interface .biofood-admin-menu summary {
+        color: #ffffff !important;
+        cursor: pointer !important;
+        list-style: none !important;
+        font-size: 0.95rem !important;
+        font-weight: 800 !important;
+        line-height: 58px !important;
+        white-space: nowrap !important;
+    }
+
+    body.admin-interface .biofood-admin-menu summary::-webkit-details-marker {
+        display: none !important;
+    }
+
+    body.admin-interface .biofood-admin-menu summary::after {
+        content: "⌄" !important;
+        color: #10b981 !important;
+        margin-left: 0.45rem !important;
+        font-weight: 900 !important;
+    }
+
+    body.admin-interface .biofood-admin-menu-list {
+        position: absolute !important;
+        top: calc(100% - 2px) !important;
+        left: 50% !important;
+        z-index: 1000 !important;
+        display: none !important;
+        min-width: 220px !important;
+        padding: 0.45rem !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 10px !important;
+        box-shadow: 0 18px 35px rgba(15, 23, 42, 0.16) !important;
+        transform: translateX(-50%) !important;
+    }
+
+    body.admin-interface .biofood-admin-menu[open] .biofood-admin-menu-list {
+        display: grid !important;
+        gap: 0.25rem !important;
+    }
+
+    body.admin-interface .biofood-admin-menu-list a,
+    body.admin-interface .biofood-admin-menu-list a:link,
+    body.admin-interface .biofood-admin-menu-list a:visited {
+        display: block !important;
+        color: #0f172a !important;
+        background: transparent !important;
+        border-radius: 8px !important;
+        padding: 0.72rem 0.85rem !important;
+        font-size: 0.9rem !important;
+        font-weight: 800 !important;
+        text-decoration: none !important;
+        text-shadow: none !important;
+        white-space: nowrap !important;
+    }
+
+    body.admin-interface .biofood-admin-menu-list a:hover {
+        background: #ecfdf5 !important;
+        color: #059669 !important;
+    }
+
+    body.admin-interface .biofood-admin-badge {
+        background: #ef4444 !important;
+        color: #ffffff !important;
+        border-radius: 999px !important;
+        padding: 0.28rem 0.55rem !important;
+        font-size: 0.72rem !important;
+        font-weight: 900 !important;
+        margin-left: 0.35rem !important;
+    }
+
+    body.admin-interface #user-tools {
+        order: 3 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.7rem !important;
+        flex: 0 0 auto !important;
+        float: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        color: #ffffff !important;
+        font-size: 0.92rem !important;
+        line-height: 1 !important;
+        letter-spacing: 0 !important;
+        text-align: right !important;
+    }
+
+    body.admin-interface #user-tools,
+    body.admin-interface #user-tools strong,
+    body.admin-interface #user-tools a,
+    body.admin-interface #user-tools a:link,
+    body.admin-interface #user-tools a:visited,
+    body.admin-interface #logout-form button {
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        text-transform: none !important;
+    }
+
+    body.admin-interface #user-tools a::before {
+        content: "/" !important;
+        color: #64748b !important;
+        margin-right: 0.7rem !important;
+    }
+
+    body.admin-interface #logout-form {
+        display: inline !important;
+        margin: 0 !important;
+    }
+
+    body.admin-interface #logout-form::before {
+        content: "/" !important;
+        color: #64748b !important;
+        margin-right: 0.7rem !important;
+    }
+
+    body.admin-interface #logout-form button {
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        vertical-align: baseline !important;
+    }
+
+    body.admin-interface #user-tools a:hover,
+    body.admin-interface #logout-form button:hover {
+        color: #10b981 !important;
+    }
+
+    body.admin-interface .theme-toggle {
+        color: #ffffff !important;
+        margin-left: 0.25rem !important;
+    }
+
+    @media (max-width: 900px) {
+        body.admin-interface #header.biofood-admin-header,
+        body.admin-interface #container #header.biofood-admin-header {
+            align-items: flex-start !important;
+            display: grid !important;
+            gap: 0.75rem !important;
+            padding: 14px 18px !important;
+        }
+
+        body.admin-interface #branding,
+        body.admin-interface #nav-global.biofood-admin-nav,
+        body.admin-interface #user-tools {
+            min-width: 0 !important;
+            justify-content: flex-start !important;
+            line-height: 1.4 !important;
+            text-align: left !important;
+        }
+
+        body.admin-interface #branding h1,
+        body.admin-interface .biofood-admin-menu summary {
+            line-height: 1.4 !important;
+        }
+
+        body.admin-interface .biofood-admin-menu-list {
+            left: 0 !important;
+            transform: none !important;
+        }
+
+        body.admin-interface #user-tools {
+            flex-wrap: wrap !important;
+        }
+    }
+</style>
+{% endblock %}

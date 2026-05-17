@@ -2,6 +2,9 @@
 - [Stock Alert Architecture](project_stock_alerts.md) — Arquitectura de alertas de stock crítico con Signals + Cron fallback
 - [Balance Forecast with Pandas](project_balance_forecast.md) — Calculo avanzado de forecast de saldo con pandas, tendencias y patrones
 - [Nutrition Facts Models](project_nutrition_models.md) — Modelo NutritionFact para informacion nutricional + tool chatbot
-- [Chatbot Skills V2](project_chatbot_skills_v2.md) — Servicios compartidos y tools compuestos para chatbot (12 tools)
+- [Chatbot Skills V2](project_chatbot_skills_v2.md) — Servicios compartidos y tools compuestos para chatbot (15 tools)
 - [Loan System](project_loan_system.md) — Sistema de prestamos temporales con aprobacion via WhatsApp/chatbot
 - [Loan Twilio Integration](project_loan_twilio.md) — Integracion completa con Twilio: notificaciones automaticas y webhook SI/NO
+- [School Portal](project_school_portal.md) — Portal web para colegios con login Django, dashboard y sistema de notificaciones
+- [School Data Isolation](project_school_isolation.md) — Aislamiento total de datos por escuela - cada colegio solo ve los suyos
+- [School Alerts Integration](project_school_alerts_integration.md) — Alertas de stock y alérgenos crean notificaciones automaticas en el portal

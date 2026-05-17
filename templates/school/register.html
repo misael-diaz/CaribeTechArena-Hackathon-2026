@@ -1,0 +1,112 @@
+{% extends 'school/base.html' %}
+
+{% block title %}Registrar Usuario - BioFood School{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 2rem auto;">
+    <div class="card">
+        <div class="card-header">
+            👤 Registrar Nuevo Usuario
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    {{ form.username.label }}
+                </label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div style="color: #dc3545; font-size: 0.85rem; margin-top: 0.3rem;">
+                    {{ form.username.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    {{ form.email.label }}
+                </label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div style="color: #dc3545; font-size: 0.85rem; margin-top: 0.3rem;">
+                    {{ form.email.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                        {{ form.password1.label }}
+                    </label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                    <div style="color: #dc3545; font-size: 0.85rem; margin-top: 0.3rem;">
+                        {{ form.password1.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                        {{ form.password2.label }}
+                    </label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                    <div style="color: #dc3545; font-size: 0.85rem; margin-top: 0.3rem;">
+                        {{ form.password2.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    {{ form.school.label }}
+                </label>
+                {{ form.school }}
+                {% if form.school.errors %}
+                <div style="color: #dc3545; font-size: 0.85rem; margin-top: 0.3rem;">
+                    {{ form.school.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    {{ form.role.label }}
+                </label>
+                {{ form.role }}
+                {% if form.role.errors %}
+                <div style="color: #dc3545; font-size: 0.85rem; margin-top: 0.3rem;">
+                    {{ form.role.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    {{ form.phone.label }}
+                </label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                <div style="color: #dc3545; font-size: 0.85rem; margin-top: 0.3rem;">
+                    {{ form.phone.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    Registrar Usuario
+                </button>
+                <a href="{% url 'school:dashboard' %}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
