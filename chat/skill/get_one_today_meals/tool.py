@@ -1,7 +1,6 @@
 from langchain.tools import tool
+from django.db import connection
 from django.utils import timezone
-from transaction.models import Transaction
-from parent.models import Parent
 
 @tool
 def get_one_today_meals(parent_phone: str, student_name: str) -> str:
@@ -11,22 +10,45 @@ def get_one_today_meals(parent_phone: str, student_name: str) -> str:
     """
     today = timezone.now().date()
     try:
-        parent = Parent.objects.get(phone_e164=parent_phone)
-        student = parent.students.filter(name__icontains=student_name).first()
-        if not student:
-            return f"No se encontró un estudiante llamado {student_name} vinculado a este número."
-        
-        transactions = Transaction.objects.filter(student=student, created_at__date=today)
-        if not transactions.exists():
-            return f"{student.name} no ha registrado compras hoy."
-        
-        meals = []
-        for t in transactions:
-            meals.append(f"{t.quantity}x {t.product.name}")
-        
-        meals_str = ", ".join(meals)
-        return f"{student.name} comió hoy: {meals_str}."
-    except Parent.DoesNotExist:
-        return "No se encontró un padre registrado con este número de teléfono."
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT t.quantity, p.name
+                FROM transaction_transaction t
+                JOIN product_product p ON t.product_id = p.id
+                WHERE t.student_id = (
+                    SELECT s.id FROM parent_parent p
+                    JOIN parent_parent_students pps ON p.id = pps.parent_id
+                    JOIN student_student s ON pps.student_id = s.id
+                    WHERE p.phone_e164 = %s AND UPPER(s.name) LIKE UPPER(%s)
+                    LIMIT 1
+                )
+                AND t.created_at >= %s AND t.created_at < %s
+                ORDER BY t.created_at DESC
+            """, [parent_phone, f'%{student_name}%', today, today.replace(day=today.day + 1) if today.day < 28 else None])
+            
+            # Re-run with safer date handling if needed
+            if not cursor.rowcount:
+                cursor.execute("""
+                    SELECT t.quantity, p.name
+                    FROM transaction_transaction t
+                    JOIN product_product p ON t.product_id = p.id
+                    WHERE t.student_id = (
+                        SELECT s.id FROM parent_parent p
+                        JOIN parent_parent_students pps ON p.id = pps.parent_id
+                        JOIN student_student s ON pps.student_id = s.id
+                        WHERE p.phone_e164 = %s AND UPPER(s.name) LIKE UPPER(%s)
+                        LIMIT 1
+                    )
+                    AND DATE(t.created_at) = %s
+                    ORDER BY t.created_at DESC
+                """, [parent_phone, f'%{student_name}%', today])
+            
+            transactions = cursor.fetchall()
+
+        if not transactions:
+            return f"{student_name} no ha registrado compras hoy."
+
+        meals = [f"{qty}x {name}" for qty, name in transactions]
+        return f"{student_name} comió hoy: {', '.join(meals)}."
     except Exception as e:
         return f"Error al consultar transacciones: {str(e)}"

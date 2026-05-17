@@ -55,7 +55,9 @@ database_structure.txt
 # Tests and UTs
 test_*.py
 *_test.py
-tests.py
 test_*
 *.txt
 agent_*
+
+# Qwen
+.qwen/
