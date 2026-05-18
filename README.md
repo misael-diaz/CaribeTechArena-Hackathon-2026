@@ -1,7 +1,10 @@
 # CaribeTechArena-Hackathon-2026
 
+The [Caribe Tech Arena](https://www.caribetech.co/) is one of the most important events for software developers and enthusiasts in the Caribbean region in Spring 2026.
 
-## Meet the Team that formed out of serendipity
+The event took place in the First Living Lab of the Caribbean *Laboratorio Vivo* of the Universidad de la Costa (CUC) in Barranquilla Colombia.
+
+## Meet the team that formed out of serendipity
 
 Team 8 [Dai hachi han (第八班)]: *Los Kuervos*
 
