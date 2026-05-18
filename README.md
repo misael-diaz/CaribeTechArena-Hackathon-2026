@@ -1,8 +1,8 @@
 # CaribeTechArena-Hackathon-2026
 
-The [Caribe Tech Arena](https://www.caribetech.co/) is one of the most important events for software developers and enthusiasts in the Caribbean region in Spring 2026.
+The [Caribe Tech Arena](https://www.caribetech.co/) is one of the most important events for software developers and enthusiasts in the Caribbean region during this Spring 2026.
 
-The event took place in the First Living Lab of the Caribbean *Laboratorio Vivo* of the Universidad de la Costa (CUC) in Barranquilla Colombia.
+The event took place in the First Living Lab of the Caribbean *Laboratorio Vivo* of the Universidad de la Costa (CUC) in Barranquilla Colombia. The main objective of the event was to connect talented software developers with local startups. The mentors of the event were tasked to identify developers that can tackle real business problems, these were presented by a handful of startups. The participants had to teamup in groups of four and take key roles such as systems architect, product owner, frontend developer, and backend engineer. The teams were expected to leverage AI tools to deliver a Minimum Viable Product (MVP) in 24 hours sharp.
 
 ## Meet the team that formed out of serendipity
 
