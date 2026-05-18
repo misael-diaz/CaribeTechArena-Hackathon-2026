@@ -27,6 +27,10 @@ Juan is the true champion of this project by implementing the most important req
 
 I am looking forward to the next opportunity to collaborate and I am sure they all share the same wish.
 
+## Mentors
+
+We had the opportunity to speak with Oswaldo Saumet, he is the head of IT of *Medicos sin Fronteras*, he was a very approachable person with interest in advicing on best practices with SQL databases. We also met Dario Guzmán, a startup founder, he shared with us his experiences with hackathons back when participants had to write all the code themselves. We also had the opportunity to meet Sergio Molinares, a cybersecurity expert, he came frequently to check on our progress. We are thankful for all the experiences and advice that they shared with us.
+
 ## Notes
 
 The text that follows has been left unmodified in the original language that it was
