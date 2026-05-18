@@ -55,6 +55,16 @@ The hackathon was full with teams that delivered highly competitive solutions. T
 
 The Byte Arena was fierce and merciless and we all learned something from it.
 
+## Conclusions: Beyond Chatbots
+
+Talent is driven by the calling to solve challenging problems. I can understand no business wants to deliver less to clients now that AI makes it possible to develop solutions at rates never seen before (not necessarily of higher quality however if operating in unhinged mode). However, I don't think that doing just that is enough to scale and the startup founders surely know that. It all boils down to innovation. And what I mean about that is that talent is driven to solving innovative problems, I think that chabots are out of the vogue even if they can call us and have a conversation with us and take actions based on those interactions. Everyone is doing the same and when everyone is doing the same, especially in a hurry, it is less likely to innovate. You are not innovating you are reacting to a trend.
+
+My other concern is that I feel that apps are becoming too annoying by trying to predict my patterns and really it is disheartening from a users perspective. I want performant software. What I don't want is software that is constantly changing and degrading over time. This goes to all the talented software developers that read this, you can work on more exciting problems than this and you will be glad that you followed this advice.
+
+It would be great if next year we are challenged with problems beyond just conversational chatbots and dashboards. If you want to keep the local talent you may as well consider to level it up.
+
+Nevertheless, I am thankful for the experience of collaborating in a team to address real business problems. The location was great, the mentors were outstanding, the food was delicious, the adrelanine levels were skyrocketing, and we were all having a great time while being considerate and respectful of others. I strongly recommend joining the Caribe Tech Arena next year because I know it is only going to get better.
+
 ## Notes
 
 The text that follows has been left unmodified in the original language that it was
