@@ -2,23 +2,11 @@
 
 ## Meet the Team
 
-I want to state from the beginning that we did not know each other prior to the event,
-and I think that was a truly enriching experience that made the event more real. Working
-with people you know is fantastic and sure you can move faster and of course you
-can trust (or not) the work done by your peers and also know what their strengths and limitations
-are. The social dynamic is familiar and fluent. Working with people you don't know at
-all that come from different backgrounds, that have different interests and stack preferences is unmistakingly a challenge in itself.
+I want to state from the beginning that we did not know each other prior to the event, and I think that was a truly enriching experience that made the event more real. Working with people you know is fantastic and sure you can move faster and of course you can trust (or not) the work done by your peers and also know what their strengths and limitations are. The social dynamic is familiar and fluent. Working with people you don't know at all that come from different backgrounds, that have different interests and stack preferences is unmistakingly a challenge in itself.
 
-It was interesting to find out that we
-were all considering in one way or another not to attend the event for various reasons
-a couple of days earlier. However, the event coordinator reached out to us via WhatsApp and put us in
-contact to see if we could form a team. I found out that there were quite approachable
-people, friendly, and eager to learn from the event. They did not care about the bounties,nor did I. We cared more about experiencing the challenge of addressing real
-business problems in a constrained time window (24 hours).
+It was interesting to find out that we were all considering in one way or another not to attend the event for various reasons a couple of days earlier. However, the event coordinator reached out to us via WhatsApp and put us in contact to see if we could form a team. I found out that there were quite approachable people, friendly, and eager to learn from the event. They did not care about the bounties,nor did I. We cared more about experiencing the challenge of addressing real business problems in a constrained time window (24 hours).
 
-To my surprise they were quite open at my intention to participate without leveraging AI to generate the code on my behalf. To me that was a welcoming gesture and that's why at that
-moment I left behind any hesitation to participate in a team, for I was already prepared
-to operate in solo dev mode.
+To my surprise they were quite open at my intention to participate without leveraging AI to generate the code on my behalf. To me that was a welcoming gesture and that's why at that moment I left behind any hesitation to participate in a team, for I was already prepared to operate in solo dev mode.
 
 Last but not least here are the individuals that conformed the last minute team:
 
@@ -27,9 +15,7 @@ Last but not least here are the individuals that conformed the last minute team:
 - **Frontend Engineer** David Perez Sarmiento
 - **Cybersecurity Specialist** Esteban Espitia 
 
-We all contributed to the development in one way or another, for code is not the only
-form of contribution. We lived focused discussions trying to understand the problem and
-finding out how to tackle it best with the tools at our disposal.
+We all contributed to the development in one way or another, for code is not the only form of contribution. We lived focused discussions trying to understand the problem and finding out how to tackle it best with the tools at our disposal.
 
 ## Note
 
