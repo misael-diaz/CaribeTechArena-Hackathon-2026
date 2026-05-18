@@ -19,6 +19,8 @@ We all contributed to the development in one way or another, for code is not the
 
 Juan is the true champion of this project by implementing the most important requirements of this challenge by leveraging AI to generate the code. He also was the one that advocated for taking advantage of *django* for rapid development because of its monolithic design. I checked the SQL queries and fixed a logic issue that the AI did not foresee because it did not have enough context about the provided dataset. I also pointed out the timezone issues, the original data lacked the timezone information and the hosting server for our app was in another timezone. I also had the chance to write a tiny code written in C to ingest SQLite with nutrition fact data based on openfood facts [database](https://world.openfoodfacts.org/data). Because the dataset was too large to export it all on time and understand it I asked AI to generate data based on it (and it's likely that it used other sources hardcoded into its training data). David and I worked alongside to prepare the presentation which was also assisted by AI but revised by us. We discussed what worked and what didn't and what the CEO would care about during our pitch presentation. And Esteban analyzed the code for vulnerabilities, we did not have the time to address them but documented them in this [issue](https://github.com/juanjh1/Byte/issues/8) on the original [repository](https://github.com/juanjh1/Byte). 
 
+I am looking forward to the next opportunity to collaborate and I am sure they all share the same wish.
+
 ## Note
 
 The text that follows has been left unmodified in the original language that it was
