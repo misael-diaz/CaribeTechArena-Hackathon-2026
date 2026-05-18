@@ -31,6 +31,10 @@ I am looking forward to the next opportunity to collaborate and I am sure they a
 
 We had the opportunity to speak with Oswaldo Saumet, he is the head of IT of *Medicos sin Fronteras*, he was a very approachable person with interest in advicing on best practices with SQL databases. We also met Dario Guzmán, a startup founder, he shared with us his experiences with hackathons back when participants had to write all the code themselves. We also had the opportunity to meet Sergio Molinares, a cybersecurity expert, he came frequently to check on our progress. We are thankful for all the experiences and advice that they shared with us.
 
+## Recommendations to BioFood
+
+After watching the solutions presented by the other teams I noticed that some of them recommended to setup a system that would monitor and even allow parents to prevent their children to buy certain goods. At first this could seem to be a great feature, enabling parents to control what their children consume at school; however, as a parent myself I strongly disagree with that. First, healthy parent-child relationship are based on trust and communication. If you need to enforce something on your child maybe there's a problem. I am not a phsychologist but the idea does not sound right to me. The other reason is that children like to share things with their friends or at least I hope that they still do because I am very fond of my childhood experiences. By blocking the ability of children to buy certain goods that could mean to disrupt their natural behavior of sharing something nice that they may not even consume to their friends. Technological innovations should enrich social interactions, not disrupt them. They may not have the data to quantify how their app fosters children interactions but it might be as important as other metrics even if they are not as easy to correlate with revenue. I think it is worthwhile to investigate if there are hidden patterns in the dataset that can be discovered by leveraing Machine Learning (ML) and AI tools. 
+
 ## Notes
 
 The text that follows has been left unmodified in the original language that it was
