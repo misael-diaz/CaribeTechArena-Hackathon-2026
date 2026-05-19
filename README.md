@@ -43,6 +43,15 @@ We focused mostly on the chatbot interaction with the parents and the nutritiona
 
 After watching the solutions presented by the other teams I noticed that some of them recommended settin up a system that would monitor and even allow parents to prevent their children from buying certain goods. At first this could seem to be a great feature, enabling parents to control what their children consume at school; however, as a parent myself I strongly disagree with that. First, healthy parent-child relationships are based on trust and communication. If you need to enforce something on your child maybe there's a problem. I am not a psychologist but the idea does not sound right to me. The other reason is that children like to share things with their friends or at least I hope that they still do because I am very fond of my childhood experiences. By blocking the ability of children to buy certain goods that could disrupt their natural behavior of sharing something nice that they may not even consume to their friends. Technological innovations should enrich social interactions, not disrupt them. They may not have the data to quantify how their app fosters children interactions but it might be as important as other metrics even if they are not as easy to correlate with revenue. I think it is worthwhile to investigate if there are hidden patterns in the dataset that can be discovered by means of Machine Learning (ML) and AI tools. 
 
+Not all your clients want to receive notifications and you must provide a means for them to opt **in** and the **notification frequency** when they do; otherwise the default should be no notifications. If you disregard this your application is behaves as a spamming application to those clients. 
+
+You should provide means to your clients to get charged automatically with caps in place. Why some of your clients would prefer this approach instead of being notified that their balance is low.
+
+Do you actually need a chatbot to present the nutrition summary to your clients? No you don't need it. A simple Natural Language Processing (NLP) can infer the intent of a text message and that means that you can leverage that instead of a chatbot which will always cost a lot more because you own the NLP script, meaning zero token consumption. If you want to deliver the same with less research how you can introduce NLP into your business logic.
+
+So my final recommendation is to thoroughly consider if you can do more with less, meaning that chatbots might be the trend now but that does not mean that they are the best solution.
+
+
 ## Lessons Learned
 
 The hackathon was full with teams that delivered highly competitive solutions. This was a great experience for us to interact with other talented software developers. Here is what we learned.
