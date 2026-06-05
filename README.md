@@ -6,7 +6,9 @@ The event took place in the First Living Lab of the Caribbean *Laboratorio Vivo*
 
 ## Meet the team that formed out of serendipity
 
-Team 8 [Dai hachi han (第八班)]: *Los Kuervos*
+Team 8 [Dai hachi han (第八班)]: *Los Kuervos* (3rd ranking team)
+
+![ranking](https://github.com/misael-diaz/CaribeTechArena-Hackathon-2026/blob/c84b515644691081147d4b374bf5ea4ae69c8175/public/ranking.png)
 
 I want to state from the beginning that we did not know each other prior to the event, and I think that was a truly enriching experience that made the event more real. Working with people you know is fantastic and sure you can move faster and of course you can trust (or not) the work done by your peers and also know what their strengths and limitations are. The social dynamic is familiar and fluent. Working with people you don't know at all that come from different backgrounds, that have different interests and stack preferences is unmistakingly a challenge in itself.
 
